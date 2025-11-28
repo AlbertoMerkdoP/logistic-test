@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística Atún Enlatado | Análisis Integral</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chosen Palette: Deep Ocean Void (Dark Blue #000814, Neon Cyan #00f3ff, Warning Amber #ff9f1c) -->
+    
+    <!-- Application Structure Plan: 
+         1. Background: Interactive Three.js scene with a procedural metallic can floating in a dark void.
+         2. Foreground: 'Holographic' UI overlay using CSS glassmorphism and neon borders.
+         3. Navigation: Bottom docked 'Command Bar' to switch between report chapters (Product, Supply, Storage, Risks).
+         4. Content Area: Dynamic panels that slide in/fade in, presenting the textual summary and relevant charts.
+         5. Interaction: Clicking nav items updates the 3D camera angle slightly and changes the data displayed.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Histamine Risk: Line Chart (Temp vs Time) -> Shows the critical control point mentioned in the report (4°C).
+         2. Loining Logic: Doughnut Chart -> Visualizes the 60% waste reduction in transport.
+         3. Risk Matrix: Radar Chart -> visualizes the impact of El Niño vs Regulations vs Market.
+         4. 3D Can: Three.js Cylinder with high metalness material to simulate the 'tinplate' description.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #000205;
+            color: #e0f2fe;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden; /* Prevent scrolling, app-like feel */
+        }
+
+        .font-mono {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Holographic Glass Effect */
+        .holo-panel {
+            background: rgba(4, 28, 44, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1), inset 0 0 20px rgba(0, 243, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .holo-panel:hover {
+            border-color: rgba(0, 243, 255, 0.6);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        }
+
+        /* Text Glow */
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+        }
+
+        .text-glow-amber {
+            text-shadow: 0 0 10px rgba(255, 159, 28, 0.7);
+        }
+
+        /* Scroller for text content */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 2px;
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            max-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        
+        .scan-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.05) 51%, transparent 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .active-tab {
+            background: rgba(0, 243, 255, 0.2);
+            border-bottom: 2px solid #00f3ff;
+            color: #fff;
+        }
+
+        #three-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Background -->
+    <div id="three-container"></div>
+    <div class="scan-overlay"></div>
+
+    <!-- Main UI Layer -->
+    <div class="ui-layer p-4 md:p-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-4 holo-panel p-4 rounded-lg">
+            <div>
+                <h1 class="text-2xl md:text-4xl font-bold uppercase tracking-widest text-white text-glow">
+                    Logística <span class="text-[#00f3ff]">Atún Enlatado</span>
+                </h1>
+                <p class="text-xs font-mono text-gray-400 mt-1">SISTEMA DE ANÁLISIS INTEGRAL v2.5 // ESTADO: EN LÍNEA</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <div class="text-[#ff9f1c] font-mono text-sm">ALERTA ACTIVA</div>
+                <div class="text-xs text-gray-400">MONITOREO DE EL NIÑO (ENOS)</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area (Split View) -->
+        <main class="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden relative">
+            
+            <!-- Left Panel: Text & Insights -->
+            <section id="info-panel" class="w-full md:w-1/3 holo-panel rounded-lg p-6 flex flex-col h-full md:h-auto overflow-hidden transition-all duration-500 transform translate-x-0">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                    <h2 id="section-title" class="text-xl text-[#00f3ff] font-bold uppercase">Resumen Ejecutivo</h2>
+                    <span class="text-xs font-mono bg-[#00f3ff] text-black px-2 py-0.5 rounded">DATA</span>
+                </div>
+                
+                <div id="content-text" class="custom-scroll overflow-y-auto flex-1 pr-2 text-sm md:text-base leading-relaxed text-gray-200">
+                    <!-- Dynamic Content Injected Here -->
+                    <p>La industria global del atún enlatado es un microcosmos de complejidad logística. Este panel interactivo desglosa las variables biológicas, técnicas y geopolíticas que transforman un recurso vivo en un commodity estable.</p>
+                    <br>
+                    <p class="text-gray-400 italic">Seleccione un módulo en la parte inferior para iniciar el análisis detallado.</p>
+                </div>
+
+                <!-- KPI Box -->
+                <div class="mt-4 border-t border-gray-700 pt-4">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase">Dato Crítico</div>
+                            <div id="kpi-value" class="text-2xl font-mono text-[#ff9f1c] font-bold">2-5 Años</div>
+                        </div>
+                        <div id="kpi-label" class="text-xs text-right text-gray-400">Vida Útil del Producto</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Spacer for 3D View visibility -->
+            <div class="hidden md:block md:w-1/3 pointer-events-none"></div>
+
+            <!-- Right Panel: Data Visualization -->
+            <section id="chart-panel" class="w-full md:w-1/3 holo-panel rounded-lg p-6 flex flex-col justify-center h-64 md:h-auto transition-all duration-500 transform translate-x-0 opacity-100">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-mono text-gray-400 uppercase">Visualización de Datos</h3>
+                    <div class="h-2 w-2 rounded-full bg-[#00f3ff] animate-pulse"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                
+                <p id="chart-caption" class="text-xs text-center mt-3 text-gray-400 font-mono border-l-2 border-[#ff9f1c] pl-2 ml-4">
+                    Vista general de la cadena de valor
+                </p>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation (Command Bar) -->
+        <nav class="mt-6 holo-panel p-2 rounded-lg flex flex-wrap justify-between md:justify-center gap-2 md:gap-8 z-20">
+            <button onclick="updateState('product')" class="nav-btn flex-1 md:flex-none px-6 py-3 rounded hover:bg-white/10 text-xs md:text-sm font-bold uppercase transition-colors text-center border-l-2 border-transparent hover:border-[#00f3ff]">
+                01. Producto & Bio
+            </button>
+            <button onclick="updateState('supply')" class="nav-btn flex-1 md:flex-none px-6 py-3 rounded hover:bg-white/10 text-xs md:text-sm font-bold uppercase transition-colors text-center border-l-2 border-transparent hover:border-[#00f3ff]">
+                02. Cadena & Lomos
+            </button>
+            <button onclick="updateState('storage')" class="nav-btn flex-1 md:flex-none px-6 py-3 rounded hover:bg-white/10 text-xs md:text-sm font-bold uppercase transition-colors text-center border-l-2 border-transparent hover:border-[#00f3ff]">
+                03. Almacén & Clientes
+            </button>
+            <button onclick="updateState('risks')" class="nav-btn flex-1 md:flex-none px-6 py-3 rounded hover:bg-white/10 text-xs md:text-sm font-bold uppercase transition-colors text-center border-l-2 border-transparent hover:border-[#00f3ff]">
+                04. Riesgos & Futuro
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        // --- DATA STORE ---
+        const appData = {
+            product: {
+                title: "01. Taxonomía y Bioquímica",
+                text: `
+                    <p class="mb-4"><strong class="text-[#00f3ff]">Variabilidad Biológica:</strong> La logística comienza con la especie. El <em>Skipjack</em> (Listado) permite volumen y alta rotación. El <em>Yellowfin</em> (Aleta Amarilla) requiere un manejo delicado en estiba para evitar daños físicos y mantener su valor premium.</p>
+                    <p class="mb-4"><strong class="text-[#ff9f1c]">El Factor Histamina:</strong> El parámetro más crítico. A diferencia de otros enlatados, el atún es bioquímicamente inestable. Si la temperatura supera los <span class="font-mono text-white">4°C</span>, comienza la formación de histamina tóxica.</p>
+                    <p class="mb-2"><strong>Impacto Logístico:</strong></p>
+                    <ul class="list-disc pl-5 space-y-1 text-gray-400 text-xs">
+                        <li>Cadena de frío ininterrumpida obligatoria.</li>
+                        <li>Cuarentenas de laboratorio para metales pesados.</li>
+                        <li>Empaque: Latas vs Pouches (mayor densidad de carga).</li>
+                    </ul>
+                `,
+                kpiValue: "< 4°C",
+                kpiLabel: "Límite Crítico Temperatura",
+                chartType: 'line',
+                chartData: {
+                    labels: ['0h', '1h', '2h', '3h', '4h', '5h'],
+                    datasets: [{
+                        label: 'Riesgo Histamina (ppm)',
+                        data: [5, 8, 12, 45, 120, 300],
+                        borderColor: '#ff9f1c',
+                        backgroundColor: 'rgba(255, 159, 28, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Límite Seguro (50ppm)',
+                        data: [50, 50, 50, 50, 50, 50],
+                        borderColor: '#00f3ff',
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }]
+                },
+                caption: "Curva exponencial de formación de histamina tras ruptura de la cadena de frío."
+            },
+            supply: {
+                title: "02. Configuración de Cadena",
+                text: `
+                    <p class="mb-4"><strong class="text-[#00f3ff]">La Lógica de los Lomos:</strong> El modelo moderno deslocaliza el procesamiento. El atún se limpia y cuece en origen (Ecuador, Tailandia), descartando cabezas y espinas.</p>
+                    <p class="mb-4">Solo se transportan lomos limpios congelados a los mercados de destino (Europa, EE.UU.), reduciendo drásticamente la huella de carbono y el costo logístico.</p>
+                    <div class="bg-blue-900/30 p-2 rounded border-l-2 border-[#00f3ff]">
+                        <p class="text-xs text-gray-300"><strong>Transbordo (Transshipment):</strong> Permite maximizar tiempo de pesca, pero introduce riesgos de trazabilidad IUU (Pesca Ilegal).</p>
+                    </div>
+                `,
+                kpiValue: "60%",
+                kpiLabel: "Reducción de Peso Transportado",
+                chartType: 'doughnut',
+                chartData: {
+                    labels: ['Lomos Útiles (Exportado)', 'Desperdicio/Harina (Origen)'],
+                    datasets: [{
+                        data: [40, 60],
+                        backgroundColor: ['#00f3ff', '#1f2937'],
+                        borderColor: '#000814',
+                        borderWidth: 2
+                    }]
+                },
+                caption: "Composición del Atún Entero: Transportar desperdicio es ineficiente."
+            },
+            storage: {
+                title: "03. Inventarios y Clientes",
+                text: `
+                    <p class="mb-4"><strong class="text-[#ff9f1c]">Amenaza de Oxidación:</strong> El "sudado de carga" por humedad relativa alta (>75%) corroe las latas. Se requieren deshumidificadores en almacenes costeros.</p>
+                    <p class="mb-4"><strong>Gestión FEFO:</strong> <em>First Expired, First Out</em>. Aunque dura años, los retailers exigen recibir el producto con el <span class="text-white">75%</span> de su vida útil remanente.</p>
+                    <p class="text-xs text-gray-400 mt-2">El servicio al cliente depende de la precisión en el picking de múltiples formatos (SKUs) y evitar quiebres de stock en un mercado de commodities.</p>
+                `,
+                kpiValue: "75%",
+                kpiLabel: "Vida Útil Requerida por Retail",
+                chartType: 'bar',
+                chartData: {
+                    labels: ['Lata Estándar', 'Pouch Flexible', 'Vidrio Premium'],
+                    datasets: [{
+                        label: 'Densidad de Carga (Unidades/Pallet)',
+                        data: [2400, 3200, 1800],
+                        backgroundColor: '#00f3ff'
+                    }]
+                },
+                caption: "Eficiencia Logística: El Pouch permite mayor densidad que la lata o vidrio."
+            },
+            risks: {
+                title: "04. Riesgos y Competitividad",
+                text: `
+                    <p class="mb-4"><strong class="text-[#ff9f1c]">El Niño (ENOS):</strong> Calienta el Pacífico y desplaza la biomasa, alargando rutas y tiempos de ciclo. <br><em>Mitigación:</em> Diversificación de orígenes (Atlántico/Índico).</p>
+                    <p class="mb-4"><strong class="text-[#00f3ff]">Competitividad:</strong> Se basa en tres pilares:</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-gray-400 text-xs font-mono">
+                        <li>Eficiencia de Costos (Densidad por contenedor).</li>
+                        <li>Diferenciación (Trazabilidad Blockchain).</li>
+                        <li>Resiliencia (Planes de contingencia).</li>
+                    </ol>
+                `,
+                kpiValue: "ALTO",
+                kpiLabel: "Nivel de Riesgo Climático Actual",
+                chartType: 'radar',
+                chartData: {
+                    labels: ['Clima (El Niño)', 'Regulación (IUU)', 'Costos Flete', 'Obsolescencia', 'Falla Cadena Frío'],
+                    datasets: [{
+                        label: 'Impacto Potencial',
+                        data: [90, 80, 60, 30, 95],
+                        backgroundColor: 'rgba(255, 159, 28, 0.4)',
+                        borderColor: '#ff9f1c',
+                        pointBackgroundColor: '#fff'
+                    }]
+                },
+                caption: "Matriz de Riesgos: El Clima y la Inocuidad son las amenazas críticas."
+            }
+        };
+
+        // --- CHART JS SETUP ---
+        let mainChartInstance = null;
+        const ctx = document.getElementById('mainChart').getContext('2d');
+
+        function initChart() {
+            // Initial placeholder chart
+            updateChart('product');
+        }
+
+        function updateChart(stateKey) {
+            const data = appData[stateKey];
+            
+            if (mainChartInstance) {
+                mainChartInstance.destroy();
+            }
+
+            const config = {
+                type: data.chartType,
+                data: data.chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#9ca3af', font: { family: 'Share Tech Mono' } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(4, 28, 44, 0.9)',
+                            titleColor: '#00f3ff',
+                            bodyColor: '#fff',
+                            borderColor: '#00f3ff',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: data.chartType === 'line' || data.chartType === 'bar' ? {
+                        y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                    } : (data.chartType === 'radar' ? {
+                        r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false }, pointLabels: { color: '#00f3ff' } }
+                    } : {})
+                }
+            };
+
+            mainChartInstance = new Chart(ctx, config);
+        }
+
+        // --- THREE JS SETUP ---
+        let camera, scene, renderer, canMesh, labelMesh;
+        let targetRotation = 0;
+
+        function initThree() {
+            const container = document.getElementById('three-container');
+            
+            // Scene
+            scene = new THREE.Scene();
+            // Fog to blend into void
+            scene.fog = new THREE.FogExp2(0x000205, 0.05);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 8;
+            camera.position.y = 1;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+
+            const spotLight = new THREE.SpotLight(0x00f3ff, 2);
+            spotLight.position.set(5, 10, 7);
+            spotLight.angle = Math.PI / 4;
+            spotLight.penumbra = 0.5;
+            scene.add(spotLight);
+
+            const warmLight = new THREE.PointLight(0xff9f1c, 1, 10);
+            warmLight.position.set(-5, -2, 5);
+            scene.add(warmLight);
+
+            const rimLight = new THREE.SpotLight(0xffffff, 2);
+            rimLight.position.set(0, 5, -5);
+            scene.add(rimLight);
+
+            // Geometry: The Can
+            const geometry = new THREE.CylinderGeometry(1.5, 1.5, 1.2, 64);
+            
+            // Material: Brushed Metal
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xaaaaaa,
+                metalness: 0.9,
+                roughness: 0.3,
+            });
+
+            canMesh = new THREE.Mesh(geometry, material);
+            canMesh.rotation.x = 0.2;
+            scene.add(canMesh);
+
+            // Lid and Bottom
+            const lidGeo = new THREE.CylinderGeometry(1.52, 1.52, 0.05, 64);
+            const lidMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
+            const lidTop = new THREE.Mesh(lidGeo, lidMat);
+            lidTop.position.y = 0.6;
+            canMesh.add(lidTop);
+            
+            const lidBot = new THREE.Mesh(lidGeo, lidMat);
+            lidBot.position.y = -0.6;
+            canMesh.add(lidBot);
+
+            // Holographic Label (Cylinder slightly larger)
+            const labelGeo = new THREE.CylinderGeometry(1.51, 1.51, 0.8, 64, 1, true, 0, 4); // Partial cylinder
+            const labelMat = new THREE.MeshBasicMaterial({
+                color: 0x00f3ff,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.DoubleSide,
+                wireframe: false
+            });
+            // Add wireframe over it
+            const wireframeGeo = new THREE.WireframeGeometry(new THREE.CylinderGeometry(1.515, 1.515, 0.8, 16, 2, true, 0, 4));
+            const wireframeMat = new THREE.LineBasicMaterial({ color: 0x00f3ff, opacity: 0.3, transparent: true });
+            const wireframe = new THREE.LineSegments(wireframeGeo, wireframeMat);
+            
+            canMesh.add(new THREE.Mesh(labelGeo, labelMat));
+            canMesh.add(wireframe);
+
+            // Particles in background
+            const particlesGeo = new THREE.BufferGeometry();
+            const particlesCount = 500;
+            const posArray = new Float32Array(particlesCount * 3);
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 30;
+            }
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMat = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0x00f3ff,
+                transparent: true,
+                opacity: 0.5
+            });
+            const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+            scene.add(particlesMesh);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Idle rotation
+            if (canMesh) {
+                canMesh.rotation.y += 0.005;
+                
+                // Float animation
+                canMesh.position.y = Math.sin(Date.now() * 0.001) * 0.2;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        // --- APP LOGIC ---
+
+        function updateState(stateKey) {
+            const data = appData[stateKey];
+            
+            // Update Text Panel
+            const titleEl = document.getElementById('section-title');
+            const textEl = document.getElementById('content-text');
+            const kpiValEl = document.getElementById('kpi-value');
+            const kpiLabelEl = document.getElementById('kpi-label');
+            const captionEl = document.getElementById('chart-caption');
+
+            // Fade out
+            textEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                titleEl.innerText = data.title;
+                textEl.innerHTML = data.text;
+                kpiValEl.innerText = data.kpiValue;
+                kpiLabelEl.innerText = data.kpiLabel;
+                captionEl.innerText = data.caption;
+                
+                // Fade in
+                textEl.style.opacity = '1';
+            }, 300);
+
+            // Update Chart
+            updateChart(stateKey);
+
+            // Visual feedback on nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                if(btn.getAttribute('onclick').includes(stateKey)) {
+                    btn.classList.add('active-tab');
+                }
+            });
+
+            // 3D Effect: Shift Can slightly to signify change
+            if(canMesh) {
+                // Quick rotation jump
+                canMesh.rotation.y += 1.5;
+            }
+        }
+
+        // Init
+        window.onload = () => {
+            initThree();
+            initChart();
+            // Set default active tab style
+            document.querySelector('.nav-btn').classList.add('active-tab');
+        };
+
+    </script>
+</body>
+</html>
