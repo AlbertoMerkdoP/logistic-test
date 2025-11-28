@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tuna - Presentación de Producto</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #0b0d12; 
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; left: 0; 
+            z-index: -1; 
+        }
+
+        #scroll-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 500vh; /* 5 secciones */
+            z-index: 10;
+        }
+
+        .story-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+            pointer-events: none; /* Click-through */
+        }
+
+        /* Estilos de Texto "Premium Product" */
+        .info-panel {
+            width: 350px;
+            padding: 0 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .story-section.active .info-panel {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .label-overhead {
+            font-size: 0.85rem;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin: 0 0 20px 0;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        /* Layouts específicos */
+        .layout-left { justify-content: flex-start; }
+        .layout-right { justify-content: flex-end; }
+        .layout-center { justify-content: center; text-align: center; }
+
+        /* Líneas decorativas (HUD Style) */
+        .hud-line {
+            height: 1px;
+            background: linear-gradient(90deg, #00ffff, transparent);
+            width: 100px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Indicador de Scroll Minimalista */
+        .scroll-pill {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scroll-pill">Desliza para descubrir</div>
+
+    <div id="scroll-container">
+        
+        <!-- SECCIÓN 1: INTRO (Texto Izquierda, Lata Derecha) -->
+        <section class="story-section layout-left active">
+            <div class="info-panel">
+                <span class="label-overhead">Edición Limitada 2025</span>
+                <h1>REDEFINIENDO<br>LA CALIDAD.</h1>
+                <div class="hud-line"></div>
+                <p>No es solo atún. Es una obra maestra de ingeniería alimentaria. Envasado al vacío en aleación de estaño aeroespacial.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: ETIQUETA (Texto Derecha, Lata Izquierda) -->
+        <section class="story-section layout-right">
+            <div class="info-panel" style="text-align: right;">
+                <span class="label-overhead" style="color: #64ffda;">Smart Label™ v2.0</span>
+                <h1>INTERACTIVIDAD<br>EN TU MANO.</h1>
+                <div class="hud-line" style="background: linear-gradient(-90deg, #64ffda, transparent); margin-left: auto;"></div>
+                <p>Olvídate de los códigos QR. Nuestra etiqueta holográfica se despliega automáticamente para mostrarte lo que importa.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: DATOS (Texto Izquierda, Lata Derecha - Zoom In) -->
+        <section class="story-section layout-left">
+            <div class="info-panel">
+                <span class="label-overhead" style="color: #f472b6;">Trazabilidad Blockchain</span>
+                <h1>DATOS PUROS.<br>SIN SECRETOS.</h1>
+                <p>Desde las coordenadas GPS de la captura hasta la temperatura exacta de transporte. Verificado en tiempo real.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: SOSTENIBILIDAD (Texto Derecha, Lata Izquierda) -->
+        <section class="story-section layout-right">
+            <div class="info-panel" style="text-align: right;">
+                <span class="label-overhead">Certificado OceanGuard</span>
+                <h1>RESPETO POR<br>EL OCÉANO.</h1>
+                <p>Pesca 100% selectiva de Aleta Amarilla. Cero impacto en especies protegidas. Sostenibilidad que puedes ver.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: OUTRO (Centro) -->
+        <section class="story-section layout-center">
+            <div class="info-panel" style="width: 600px;">
+                <h1>EL FUTURO ESTÁ SERVIDO.</h1>
+                <p>Disponible en mercados selectos.</p>
+            </div>
+        </section>
+
+    </div>
+
+<script>
+    // --- THREE.JS CONFIG ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0d12);
+    // Niebla para fundir el suelo con el fondo infinito
+    scene.fog = new THREE.FogExp2(0x0b0d12, 0.02);
+
+    const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización retina
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    // --- GENERACIÓN DE ASSETS ---
+
+    // Metal Premium (Más oscuro, más contraste)
+    function createMetalTex() {
+        const c = document.createElement('canvas'); c.width=512; c.height=512;
+        const x = c.getContext('2d');
+        x.fillStyle='#555'; x.fillRect(0,0,512,512);
+        // Ruido fino
+        for(let i=0;i<40000;i++){
+            x.fillStyle = Math.random()>0.5?'#666':'#444';
+            x.fillRect(Math.random()*512, Math.random()*512, Math.random()*60+5, 1);
+        }
+        const t = new THREE.CanvasTexture(c);
+        t.wrapS=t.wrapT=THREE.RepeatWrapping;
+        return t;
+    }
+
+    // Holograma High-Tech (Limpio, estilo UI)
+    function createHoloTex() {
+        const c = document.createElement('canvas'); c.width=1024; c.height=512;
+        const x = c.getContext('2d');
+
+        // Fondo transparente azulado
+        x.fillStyle = 'rgba(0, 15, 30, 0.95)';
+        x.fillRect(0,0,1024,512);
+        
+        // Bordes neón
+        x.strokeStyle = '#00ffff'; x.lineWidth=5;
+        x.strokeRect(20,20,984,472);
+
+        // Grid sutil
+        x.strokeStyle = 'rgba(0,255,255,0.1)'; x.lineWidth=2;
+        for(let i=0; i<1024; i+=60) { x.beginPath(); x.moveTo(i,0); x.lineTo(i,512); x.stroke(); }
+
+        // Función Helper Texto
+        const txt = (str, px, py, s, col='#fff', align='left') => {
+            x.textAlign = align;
+            x.fillStyle = col;
+            x.shadowColor = col; x.shadowBlur = 15;
+            x.font = `700 ${s}px 'Arial'`;
+            x.fillText(str, px, py);
+            x.shadowBlur = 0;
+        };
+
+        // CONTENIDO ETIQUETA
+        // Marca
+        txt("SMART", 60, 120, 70, '#fff');
+        txt("TUNA", 60, 190, 70, '#00ffff');
+        
+        // Datos Gráficos
+        x.strokeStyle='#00ffaa'; x.lineWidth=6; x.lineCap='round';
+        x.beginPath(); x.moveTo(500, 350); x.lineTo(600, 250); x.lineTo(700, 300); x.lineTo(850, 150); x.stroke();
+        
+        // Detalles Técnicos
+        txt("TEMP: 3.4°C", 950, 450, 30, '#00ffaa', 'right');
+        txt("ORIGIN: PACIFIC_NW", 950, 400, 30, '#fff', 'right');
+        txt("BATCH: #992-AZ", 950, 80, 25, '#666', 'right');
+
+        // Icono Pez (Simple SVG Path)
+        x.save(); x.translate(550, 150); x.scale(3,3);
+        x.fillStyle='rgba(0,255,255,0.2)'; x.strokeStyle='#00ffff'; x.lineWidth=2;
+        x.beginPath(); x.moveTo(0,0); x.quadraticCurveTo(20,-10,40,0); x.lineTo(50,-5); x.lineTo(50,5); x.lineTo(40,0); x.quadraticCurveTo(20,10,0,0);
+        x.fill(); x.stroke();
+        x.restore();
+
+        const t = new THREE.CanvasTexture(c);
+        t.anisotropy = 16;
+        return t;
+    }
+
+    // --- CREACIÓN ESCENA ---
+    const grp = new THREE.Group();
+    scene.add(grp);
+
+    // Materiales
+    const metalMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.35, metalness: 0.9,
+        bumpMap: createMetalTex(), bumpScale: 0.005
+    });
+    
+    // Lata cuerpo
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,64), metalMat);
+    body.castShadow=true; body.receiveShadow=true;
+    grp.add(body);
+    
+    // Tapas (con pequeño detalle de borde)
+    const rimGeo = new THREE.TorusGeometry(1, 0.04, 16, 64);
+    const topRim = new THREE.Mesh(rimGeo, metalMat);
+    topRim.rotation.x = Math.PI/2; topRim.position.y=0.5;
+    grp.add(topRim);
+    
+    const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.98,0.98,0.05,32), metalMat);
+    lid.position.y=0.48; grp.add(lid);
+    
+    const botRim = topRim.clone(); botRim.position.y=-0.5; grp.add(botRim);
+    const bot = lid.clone(); bot.position.y=-0.48; grp.add(bot);
+
+    // Anilla Easy-Open
+    const tab = new THREE.Group();
+    const tr = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.02, 16, 32), metalMat);
+    tr.rotation.x=Math.PI/2; tr.position.x=0.4;
+    const tb = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 0.15), metalMat);
+    tb.position.x=0.2;
+    tab.add(tr, tb);
+    tab.position.set(0, 0.51, 0); tab.rotation.y=0.5;
+    grp.add(tab);
+
+    // --- ETIQUETA DEFORMABLE ---
+    const lblW = 3.3, lblH = 0.7, lblSegs = 80;
+    const lblGeo = new THREE.PlaneGeometry(lblW, lblH, lblSegs, 1);
+    const lblMat = new THREE.MeshPhysicalMaterial({
+        map: createHoloTex(),
+        transparent: true, opacity: 1, side: THREE.DoubleSide,
+        emissive: 0x002222, emissiveIntensity: 1.5, emissiveMap: createHoloTex(),
+        transmission: 0.1, roughness: 0.2
+    });
+    const lblMesh = new THREE.Mesh(lblGeo, lblMat);
+    grp.add(lblMesh);
+
+    // Update Deformación (Lógica limpia)
+    function deformLabel(progress) { // 0 a 1
+        const pos = lblGeo.attributes.position;
+        // Parámetros de la animación
+        const peelStart = THREE.MathUtils.lerp(1.0, 0.45, progress); // Dónde empieza a despegarse
+        const peelLen = THREE.MathUtils.lerp(0.0, 3.5, progress); // Cuánto se estira hacia afuera
+        
+        for(let i=0; i<=lblSegs; i++) {
+            const t = i/lblSegs;
+            const angleTotal = Math.PI * 1.7; // Cubre casi toda la lata
+            const angleOffset = Math.PI * 0.9; // Empezar detrás
+
+            let x, z;
+            if(t < peelStart) {
+                // Modo Cilindro
+                const ang = -t * (angleTotal/peelStart) + angleOffset; // Negativo para dirección correcta
+                x = Math.sin(ang) * 1.02;
+                z = Math.cos(ang) * 1.02;
+            } else {
+                // Modo Despegado (Tangencial)
+                const angEnd = -angleTotal + angleOffset; // Punto final del pegado
+                const r = 1.02;
+                const pX = Math.sin(angEnd)*r;
+                const pZ = Math.cos(angEnd)*r;
+                
+                // Vector tangente en ese punto
+                // Derivada de (sin, cos) es (cos, -sin)
+                const tX = Math.cos(angEnd); 
+                const tZ = -Math.sin(angEnd);
+                
+                const dist = (t - peelStart) * peelLen;
+                
+                // Curva de Bezier simple simulada para darle elegancia al papel
+                const curveOut = dist * 0.5; 
+                
+                x = pX + tX*dist + (tX*curveOut);
+                z = pZ + tZ*dist + (tZ*curveOut) + (dist*0.2); // +Z para acercarse a cámara
+            }
+            
+            // Aplicar
+            for(let k=0; k<2; k++) {
+                const idx = i + k*(lblSegs+1);
+                pos.setXYZ(idx, x, (k===0?lblH/2:-lblH/2), z);
+            }
+        }
+        pos.needsUpdate = true;
+        lblGeo.computeVertexNormals();
+    }
+
+    // --- ILUMINACIÓN CINEMÁTICA ---
+    const spotKey = new THREE.SpotLight(0xffffff, 8);
+    spotKey.position.set(5, 8, 5);
+    spotKey.angle = 0.5; spotKey.penumbra = 0.5;
+    spotKey.castShadow = true;
+    scene.add(spotKey);
+
+    const spotRim = new THREE.SpotLight(0x0088ff, 10); // Azul fuerte atrás
+    spotRim.position.set(-5, 2, -5);
+    scene.add(spotRim);
+    
+    const fill = new THREE.PointLight(0x444466, 2);
+    fill.position.set(-5, 0, 5);
+    scene.add(fill);
+
+    // --- ANIMACIÓN & SCROLL ---
+    let scrollP = 0, targetP = 0;
+    
+    window.addEventListener('scroll', () => {
+        const doc = document.documentElement;
+        targetP = window.scrollY / (doc.scrollHeight - doc.clientHeight);
+        
+        // Activar clases CSS
+        document.querySelectorAll('.story-section').forEach((sec, i) => {
+            const start = i * 0.2;
+            const end = start + 0.2;
+            if(targetP >= start - 0.1 && targetP < end + 0.05) sec.classList.add('active');
+            else sec.classList.remove('active');
+        });
+        
+        if(targetP > 0.05) document.querySelector('.scroll-pill').style.opacity=0;
+    });
+
+    // Positions for Sections: [CanX, CanY, CamZ, PeelAmount, RotationY]
+    // X > 0: Lata a la derecha. X < 0: Lata a la izquierda.
+    const keyframes = [
+        { x: 1.5, y: -0.2, z: 4.5, peel: 0.0, ry: 0 },       // Sec 1: Intro (Lata Derecha)
+        { x: -1.5, y: 0.0, z: 4.0, peel: 0.6, ry: 3.5 },     // Sec 2: Tech (Lata Izquierda, Peel medio)
+        { x: 1.8, y: 0.0, z: 3.0, peel: 1.0, ry: 2.5 },      // Sec 3: Datos (Lata Derecha, Zoom In, Peel full)
+        { x: -1.2, y: -0.3, z: 5.0, peel: 0.3, ry: 5.0 },    // Sec 4: Ocean (Lata Izquierda, Lejos)
+        { x: 0.0, y: 0.2, z: 6.0, peel: 0.0, ry: 7.0 }       // Sec 5: Final (Centro)
+    ];
+
+    function lerp(start, end, t) { return start * (1-t) + end * t; }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Smooth scroll
+        scrollP += (targetP - scrollP) * 0.05;
+
+        // Determinar índices de keyframes
+        const segment = scrollP * 4; // 0 a 4
+        const idx = Math.floor(segment);
+        const nextIdx = Math.min(idx + 1, keyframes.length - 1);
+        const progress = segment - idx; // 0 a 1 dentro del segmento
+
+        if(idx >= 0 && idx < keyframes.length) {
+            const curr = keyframes[idx];
+            const next = keyframes[nextIdx];
+
+            // Interpolar Valores
+            grp.position.x = lerp(curr.x, next.x, progress);
+            grp.position.y = lerp(curr.y, next.y, progress);
+            
+            camera.position.z = lerp(curr.z, next.z, progress);
+            
+            // Rotación base + giro constante suave
+            const rotBase = lerp(curr.ry, next.ry, progress);
+            grp.rotation.y = rotBase + (Date.now()*0.0002);
+            grp.rotation.x = Math.sin(Date.now()*0.001)*0.05; // Flote suave
+            grp.rotation.z = Math.cos(Date.now()*0.0008)*0.05;
+
+            // Etiqueta
+            const peelVal = lerp(curr.peel, next.peel, progress);
+            deformLabel(peelVal);
+        }
+
+        renderer.render(scene, camera);
+    }
+    
+    // Resize Handle
+    window.addEventListener('resize', () => {
+        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth,window.innerHeight);
+    });
+
+    animate();
+
+</script>
+</body>
+</html>

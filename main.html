@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Tuna - Logística FIFO (Corregido)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #050505; 
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        canvas { 
+            display: block; 
+            position: fixed; 
+            top: 0; left: 0; 
+            z-index: -1; 
+        }
+
+        #scroll-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 700vh;
+            z-index: 10;
+        }
+
+        .story-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .info-panel {
+            width: 400px;
+            padding: 0 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .story-section.active .info-panel {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .label-overhead {
+            font-size: 0.75rem;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            display: block;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin: 0 0 25px 0;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        .theme-storm h1 { color: #ff4444; text-shadow: 0 0 20px rgba(255,0,0,0.3); }
+        .theme-storm .label-overhead { color: #ffaa00; }
+        
+        .theme-gold h1 { color: #ffebcd; }
+        .theme-gold .label-overhead { color: #ffd700; }
+
+        .hud-line {
+            height: 1px;
+            background: linear-gradient(90deg, currentColor, transparent);
+            width: 80px;
+            margin: 20px 0;
+            color: #00ffff;
+            opacity: 0.5;
+        }
+        .theme-storm .hud-line { color: #ff4444; }
+
+        .layout-left { justify-content: flex-start; padding-left: 5%; }
+        .layout-right { justify-content: flex-end; padding-right: 5%; text-align: right; }
+        .layout-right .hud-line { margin-left: auto; background: linear-gradient(-90deg, currentColor, transparent); }
+        .layout-center { justify-content: center; text-align: center; }
+        .layout-center .hud-line { margin: 20px auto; background: linear-gradient(90deg, transparent, currentColor, transparent); }
+
+        .scroll-pill {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; font-size: 10px; letter-spacing: 2px; color: #666; z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-pill">SCROLL EXPERIENCE</div>
+
+    <div id="scroll-container">
+        <!-- 1. INTRO -->
+        <section class="story-section layout-left active">
+            <div class="info-panel">
+                <span class="label-overhead">Producto</span>
+                <h1>CALIDAD<br>DEFINITIVA.</h1>
+                <div class="hud-line"></div>
+                <p>Ingeniería alimentaria en lata de aleación aeroespacial. El comienzo de la cadena de valor.</p>
+            </div>
+        </section>
+
+        <!-- 2. TECH -->
+        <section class="story-section layout-right">
+            <div class="info-panel">
+                <span class="label-overhead">Smart Tech</span>
+                <h1>DATOS<br>VISIBLES.</h1>
+                <div class="hud-line"></div>
+                <p>Nuestra etiqueta holográfica elimina la incertidumbre. Información en tiempo real, sin escanear códigos.</p>
+            </div>
+        </section>
+
+        <!-- 3. RACK FIFO -->
+        <section class="story-section layout-left">
+            <div class="info-panel">
+                <span class="label-overhead">Gestión de Inventario</span>
+                <h1>SISTEMA<br>FIFO.</h1>
+                <div class="hud-line"></div>
+                <p><strong>First In, First Out.</strong> Rotación perfecta garantizada. Visualiza tu stock en tiempo real sobre estanterías inteligentes que priorizan la frescura.</p>
+            </div>
+        </section>
+
+        <!-- 4. TORMENTA -->
+        <section class="story-section layout-right theme-storm">
+            <div class="info-panel">
+                <span class="label-overhead">Factor Caos</span>
+                <h1>NAVEGANDO<br>LA TORMENTA.</h1>
+                <div class="hud-line"></div>
+                <p>Clima adverso. Regulaciones cambiantes. Nuestros algoritmos predictivos adaptan la ruta ante lo incontrolable.</p>
+            </div>
+        </section>
+
+        <!-- 5. LLEGADA -->
+        <section class="story-section layout-center theme-gold">
+            <div class="info-panel">
+                <span class="label-overhead">Punto de Venta</span>
+                <h1>LA LLEGADA<br>TRIUNFAL.</h1>
+                <div class="hud-line"></div>
+                <p>En un entorno saturado, la transparencia es la ventaja competitiva definitiva. Tu producto brilla en el estante.</p>
+            </div>
+        </section>
+
+        <!-- 6. ECO -->
+        <section class="story-section layout-left">
+            <div class="info-panel">
+                <span class="label-overhead">Eco-Conciencia</span>
+                <h1>HUELLA<br>POSITIVA.</h1>
+                <div class="hud-line"></div>
+                <p>Trazabilidad completa desde la captura hasta el reciclaje. Compromiso real con el océano.</p>
+            </div>
+        </section>
+
+        <!-- 7. FIN -->
+        <section class="story-section layout-center">
+            <div class="info-panel">
+                <p style="font-size: 0.9rem; letter-spacing: 1px;">EL FUTURO DE LA ALIMENTACIÓN</p>
+            </div>
+        </section>
+    </div>
+
+<script>
+    const scene = new THREE.Scene();
+    const bgColor = new THREE.Color(0x050505);
+    scene.background = bgColor;
+    scene.fog = new THREE.FogExp2(0x050505, 0.025);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 5; // Posición inicial segura
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    // --- ASSETS ---
+    function createMetalTex() {
+        const c = document.createElement('canvas'); c.width=512; c.height=512;
+        const x = c.getContext('2d');
+        x.fillStyle='#666'; x.fillRect(0,0,512,512);
+        for(let i=0; i<30000; i++) {
+            x.fillStyle = Math.random()>0.5?'#777':'#555';
+            x.fillRect(Math.random()*512, Math.random()*512, Math.random()*50+10, 1);
+        }
+        const t = new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
+    }
+
+    function createCardboardTex() {
+        const c = document.createElement('canvas'); c.width=512; c.height=512;
+        const x = c.getContext('2d');
+        x.fillStyle='#8b5a2b'; x.fillRect(0,0,512,512);
+        for(let i=0; i<50000; i++) {
+            x.fillStyle = Math.random()>0.5?'#a06a3b':'#6b4220';
+            x.fillRect(Math.random()*512, Math.random()*512, 2, 2);
+        }
+        x.fillStyle='rgba(0,0,0,0.1)'; x.font="bold 80px Arial";
+        x.save(); x.translate(256, 256); x.rotate(-Math.PI/4); x.fillText("FRAGILE", -150, 0); x.restore();
+        x.strokeStyle='rgba(0,0,0,0.2)'; x.lineWidth=5; x.strokeRect(50,50,412,412);
+        return new THREE.CanvasTexture(c);
+    }
+
+    function createHoloTex() {
+        const c = document.createElement('canvas'); c.width=1024; c.height=512;
+        const x = c.getContext('2d');
+        x.fillStyle = 'rgba(0, 20, 40, 0.9)'; x.fillRect(0,0,1024,512);
+        x.strokeStyle = 'rgba(0,255,255,0.2)'; x.lineWidth=2;
+        for(let i=0; i<1024; i+=50) { x.beginPath(); x.moveTo(i,0); x.lineTo(i,512); x.stroke(); }
+        x.fillStyle='#fff'; x.font="bold 60px Arial"; x.fillText("SMART TUNA", 50, 100);
+        x.fillStyle='#00ffff'; x.font="30px Arial"; x.fillText("LOGISTICS TRACKER", 50, 150);
+        x.strokeStyle='#00ffaa'; x.lineWidth=5;
+        x.beginPath(); x.moveTo(50, 400); x.lineTo(150, 300); x.lineTo(250, 350); x.lineTo(400, 200); x.stroke();
+        x.font="50px Arial"; x.fillText("🚢 🚛 🏭", 600, 400);
+        const t = new THREE.CanvasTexture(c); t.anisotropy=16; return t;
+    }
+
+    // --- GRUPO LATA ---
+    const grp = new THREE.Group();
+    scene.add(grp);
+
+    const metalMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.3, metalness: 0.9, bumpMap: createMetalTex(), bumpScale: 0.005
+    });
+
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,64), metalMat);
+    body.castShadow=true; body.receiveShadow=true; grp.add(body);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(1,0.03,16,64), metalMat);
+    rim.rotation.x=Math.PI/2; rim.position.y=0.5; grp.add(rim);
+    const rim2 = rim.clone(); rim2.position.y=-0.5; grp.add(rim2);
+    const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.98,0.98,0.05,32), metalMat);
+    lid.position.y=0.48; grp.add(lid);
+    const bot = lid.clone(); bot.position.y=-0.48; grp.add(bot);
+    
+    const tab = new THREE.Group();
+    const tr = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.015, 16, 32), metalMat);
+    tr.rotation.x=Math.PI/2; tr.position.x=0.4;
+    const tb = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.01, 0.15), metalMat);
+    tb.position.x=0.2; tab.add(tr, tb); tab.position.set(0, 0.51, 0); tab.rotation.y=0.5; grp.add(tab);
+
+    const lblGeo = new THREE.PlaneGeometry(3.2, 0.8, 60, 1);
+    const lblMat = new THREE.MeshPhysicalMaterial({
+        map: createHoloTex(), transparent: true, side: THREE.DoubleSide,
+        emissive: 0x004444, emissiveMap: createHoloTex(), emissiveIntensity: 1.5,
+        transmission: 0.1, opacity: 0.95
+    });
+    const lblMesh = new THREE.Mesh(lblGeo, lblMat); grp.add(lblMesh);
+
+    function deformLabel(val) {
+        const pos = lblGeo.attributes.position;
+        const peelStart = THREE.MathUtils.lerp(1.0, 0.5, val);
+        for(let i=0; i<=60; i++) {
+            const t = i/60; const aTot=Math.PI*1.6; const aOff=Math.PI*0.8;
+            let x, z;
+            if(t < peelStart) {
+                const a = -t * (aTot/peelStart) + aOff;
+                x = Math.sin(a) * 1.02; z = Math.cos(a) * 1.02;
+            } else {
+                const aEnd = -aTot + aOff; const dist = (t - peelStart) * 4 * val;
+                x = Math.sin(aEnd)*1.02 + Math.cos(aEnd)*dist + (Math.cos(aEnd)*dist*0.2);
+                z = Math.cos(aEnd)*1.02 - Math.sin(aEnd)*dist - (Math.sin(aEnd)*dist*0.2);
+            }
+            for(let k=0; k<2; k++) pos.setXYZ(i+k*61, x, k===0?0.4:-0.4, z);
+        }
+        pos.needsUpdate=true; lblGeo.computeVertexNormals();
+    }
+
+    // --- GRUPO RACK FIFO ---
+    const logisticsGroup = new THREE.Group();
+    scene.add(logisticsGroup);
+    
+    const cardboardTex = createCardboardTex();
+    const boxMat = new THREE.MeshStandardMaterial({ map: cardboardTex, roughness: 0.8 });
+    const rackMat = new THREE.MeshStandardMaterial({ color: 0xe07a1f, roughness: 0.6, metalness: 0.5 });
+
+    // Postes
+    const postGeo = new THREE.BoxGeometry(0.15, 5, 0.15);
+    const beamGeo = new THREE.BoxGeometry(5, 0.1, 0.1);
+    const p1=new THREE.Mesh(postGeo,rackMat); p1.position.set(-2.5,0,-1);
+    const p2=new THREE.Mesh(postGeo,rackMat); p2.position.set(2.5,0,-1);
+    const p3=new THREE.Mesh(postGeo,rackMat); p3.position.set(-2.5,0,1);
+    const p4=new THREE.Mesh(postGeo,rackMat); p4.position.set(2.5,0,1);
+    logisticsGroup.add(p1,p2,p3,p4);
+
+    // Estantes
+    [-1.2, 1.2].forEach(y => {
+        const bF = new THREE.Mesh(beamGeo, rackMat); bF.position.set(0, y, 1);
+        const bB = new THREE.Mesh(beamGeo, rackMat); bB.position.set(0, y, -1);
+        const shelf = new THREE.Mesh(new THREE.BoxGeometry(5, 0.05, 2), rackMat);
+        shelf.position.set(0, y, 0);
+        logisticsGroup.add(bF, bB, shelf);
+    });
+
+    // Cajas
+    const boxGeo = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+    for(let i=0; i<3; i++) {
+        const box = new THREE.Mesh(boxGeo, boxMat);
+        box.position.set(-1.6 + (i*1.6), -0.55, 0);
+        box.rotation.y = (Math.random()-0.5)*0.05;
+        logisticsGroup.add(box);
+    }
+    for(let i=0; i<2; i++) {
+        const box = new THREE.Mesh(boxGeo, boxMat);
+        box.position.set(-1.6 + (i*1.6), 1.85, 0);
+        box.rotation.y = (Math.random()-0.5)*0.05;
+        logisticsGroup.add(box);
+    }
+    logisticsGroup.visible = false;
+
+    // --- LUCES ---
+    const lights = {
+        key: new THREE.SpotLight(0xffffff, 5),
+        rim: new THREE.SpotLight(0x0088ff, 5),
+        fill: new THREE.PointLight(0x444466, 2)
+    };
+    lights.key.position.set(5, 5, 5); lights.key.castShadow=true;
+    lights.rim.position.set(-5, 2, -5);
+    lights.fill.position.set(0, -3, 3);
+    scene.add(lights.key, lights.rim, lights.fill);
+
+    // --- ANIMACIÓN ---
+    let scrollP = 0, targetP = 0;
+    
+    // Keyframes: definen posición (X,Y) de la lata y (Z) de la CÁMARA
+    const keyframes = [
+        { x: 1.5, y: -0.2, z: 4.5, peel: 0, ry: 0 },    // 0: Intro
+        { x: -1.5, y: 0, z: 4.0, peel: 0.7, ry: 2 },    // 1: Tech
+        { x: 0, y: 0, z: 9.0, peel: 0.3, ry: 3.5 },     // 2: Viaje (Cámara lejos para ver rack completo)
+        { x: 1.5, y: -0.5, z: 4.0, peel: 0.8, ry: 5 },  // 3: Tormenta
+        { x: 0, y: 0.5, z: 3.5, peel: 0, ry: 6.5 },     // 4: Llegada
+        { x: -1.5, y: 0, z: 5.0, peel: 0.2, ry: 8 },    // 5: Eco
+        { x: 0, y: 0, z: 7.0, peel: 0, ry: 9 }          // 6: Fin
+    ];
+
+    const colorKeys = [
+        { k: '#ffffff', r: '#0088ff', f: '#444466' },
+        { k: '#ccffff', r: '#00ffff', f: '#004444' },
+        { k: '#ffddaa', r: '#ff9900', f: '#332200' }, // Cálido Industrial para el Rack
+        { k: '#ffaa88', r: '#ff0000', f: '#330000' },
+        { k: '#ffddaa', r: '#ffd700', f: '#443300' },
+        { k: '#eeffcc', r: '#44ff44', f: '#003300' },
+        { k: '#ffffff', r: '#ffffff', f: '#333333' }
+    ];
+
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        targetP = window.scrollY / (h.scrollHeight - h.clientHeight);
+        document.querySelectorAll('.story-section').forEach((sec, i) => {
+            const center = i / 6;
+            if(Math.abs(targetP - center) < 0.1) sec.classList.add('active');
+            else sec.classList.remove('active');
+        });
+        if(targetP > 0.05) document.querySelector('.scroll-pill').style.opacity=0;
+    });
+
+    function lerp(s, e, t) { return s*(1-t) + e*t; }
+    function lerpColor(c1, c2, t) { return new THREE.Color(c1).lerp(new THREE.Color(c2), t); }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        scrollP += (targetP - scrollP) * 0.05;
+
+        const maxIdx = 6;
+        const exactIdx = scrollP * maxIdx;
+        const currIdx = Math.floor(exactIdx);
+        const nextIdx = Math.min(currIdx + 1, maxIdx);
+        const progress = Math.max(0, Math.min(1, exactIdx - currIdx));
+
+        const k1 = keyframes[currIdx] || keyframes[maxIdx];
+        const k2 = keyframes[nextIdx] || keyframes[maxIdx];
+        const c1 = colorKeys[currIdx] || colorKeys[maxIdx];
+        const c2 = colorKeys[nextIdx] || colorKeys[maxIdx];
+
+        // MOVIMIENTO DE LATA (X, Y) y CÁMARA (Z)
+        // Corregido: La lata se queda en Z=0 (o cerca), la cámara hace el zoom.
+        grp.position.set(lerp(k1.x, k2.x, progress), lerp(k1.y, k2.y, progress), 0);
+        camera.position.z = lerp(k1.z, k2.z, progress);
+        
+        // Rotación y Flote
+        grp.rotation.y = lerp(k1.ry, k2.ry, progress) + Date.now()*0.0001;
+        grp.position.y += Math.sin(Date.now()*0.001)*0.05;
+        
+        deformLabel(lerp(k1.peel, k2.peel, progress));
+
+        // Luces
+        lights.key.color = lerpColor(c1.k, c2.k, progress);
+        lights.rim.color = lerpColor(c1.r, c2.r, progress);
+        lights.fill.color = lerpColor(c1.f, c2.f, progress);
+
+        // --- RACK LOGIC ---
+        // Visible cerca de index 2
+        const dist = 1 - Math.min(1, Math.abs(exactIdx - 2.0));
+        logisticsGroup.visible = dist > 0.05;
+        
+        if(logisticsGroup.visible) {
+            // Posicionar Rack DETRÁS de la lata (-4 en Z)
+            // Ajustamos X relativo a la lata para efecto paralaje
+            logisticsGroup.position.set(grp.position.x * 0.3, -0.5, -4);
+            logisticsGroup.rotation.y = Math.sin(Date.now()*0.0005) * 0.1;
+            
+            // Entrada suave
+            const s = Math.min(1, dist * 2);
+            logisticsGroup.scale.set(s,s,s);
+        }
+
+        // --- STORM LOGIC ---
+        const stormDist = 1 - Math.min(1, Math.abs(exactIdx - 3));
+        if(stormDist > 0) {
+             const shake = stormDist * 0.05;
+             camera.position.x = (Math.random()-0.5)*shake;
+             camera.position.y = (Math.random()-0.5)*shake;
+             lights.rim.intensity = 5 + Math.random() * 5 * stormDist;
+        } else {
+             // Reset cámara suavemente si no estamos en la tormenta
+             // (Solo X e Y, Z lo controla el keyframe)
+             camera.position.x = 0;
+             camera.position.y = 0;
+             lights.rim.intensity = 5;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    window.onresize = () => {
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    animate();
+</script>
+</body>
+</html>
