@@ -523,7 +523,15 @@
             position: absolute;
             font-weight: 800;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            border: 2px solid var(--primary);
         }
+        
+        /* Updated color scheme for heatmap zones */
+        .zone-low { background-color: #dcfce7; }
+        .zone-med { background-color: #fef08a; }
+        .zone-high { background-color: #fdba74; }
+        .zone-crit { background-color: #ef4444; }
 
         /* Documentation */
         .doc-list {
@@ -617,7 +625,7 @@
             <i data-feather="anchor" color="#FFB000"></i>
             <div>
                 <h1>SGI <span>LOGÍSTICA</span></h1>
-                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.4.0 (UI PRO)</small>
+                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.6.0 (DATA FULL)</small>
             </div>
         </div>
         <div class="nav-menu">
@@ -935,7 +943,7 @@
             </div>
         </section>
 
-        <!-- 5. STORAGE & LOGISTICS INTEGRAL (UPDATED) -->
+        <!-- 5. STORAGE & LOGISTICS INTEGRAL -->
         <section id="storage" class="section-module">
             <div class="module-header"><h2 class="module-title">Logística Integral</h2></div>
             
@@ -1054,12 +1062,12 @@
             </div>
         </section>
 
-        <!-- 7. RISKS (UPDATED HEATMAP) -->
+        <!-- 7. RISKS (UPDATED WITH ALL 23 RISKS) -->
         <section id="risks" class="section-module">
             <div class="module-header"><h2 class="module-title">Gestión de Riesgos y Factores Externos</h2></div>
             <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
                 <div class="card">
-                    <h3 style="margin-bottom: 20px;">Matriz de Calor (Factores Documentados)</h3>
+                    <h3 style="margin-bottom: 20px;">Matriz de Calor (Distribución de 23 Riesgos)</h3>
                     
                     <div style="display: flex; height: 100%;">
                         <!-- Y Axis Label -->
@@ -1069,47 +1077,61 @@
                         
                         <div style="width: 100%;">
                             <div class="heatmap-container">
-                                <!-- Y Axis Scale -->
+                                <!-- Row 5: Prob 5 -->
                                 <div class="heatmap-header">5</div>
-                                <div class="heatmap-cell" style="background:#fef08a;"></div>
-                                <div class="heatmap-cell" style="background:#fde047;"></div>
-                                <div class="heatmap-cell" style="background:#fdba74;">
-                                    <div class="risk-marker" title="El Niño">1</div>
-                                </div>
-                                <div class="heatmap-cell" style="background:#fb923c;"></div>
-                                <div class="heatmap-cell" style="background:#ef4444;">
-                                    <div class="risk-marker" title="Veda">2</div>
-                                </div>
+                                <div class="heatmap-cell zone-med"></div>
+                                <div class="heatmap-cell zone-high"></div>
+                                <div class="heatmap-cell zone-high"></div>
+                                <div class="heatmap-cell zone-crit"></div>
+                                <div class="heatmap-cell zone-crit"></div>
 
+                                <!-- Row 4: Prob 4 -->
                                 <div class="heatmap-header">4</div>
-                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
-                                <div class="heatmap-cell" style="background:#fef08a;"></div>
-                                <div class="heatmap-cell" style="background:#fde047;">
-                                    <div class="risk-marker" title="Combustible">3</div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-med"></div>
+                                <div class="heatmap-cell zone-high">
+                                    <div class="risk-marker" title="Error en Despacho">21</div>
                                 </div>
-                                <div class="heatmap-cell" style="background:#fdba74;"></div>
-                                <div class="heatmap-cell" style="background:#fb923c;"></div>
+                                <div class="heatmap-cell zone-crit">
+                                    <div class="risk-marker" title="Fenómenos Climáticos">2</div>
+                                </div>
+                                <div class="heatmap-cell zone-crit"></div>
 
+                                <!-- Row 3: Prob 3 -->
                                 <div class="heatmap-header">3</div>
-                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
-                                <div class="heatmap-cell" style="background:#fef08a;"></div>
-                                <div class="heatmap-cell" style="background:#fde047;"></div>
-                                <div class="heatmap-cell" style="background:#fdba74;"></div>
-                                <div class="heatmap-cell" style="background:#fb923c;"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-med"></div>
+                                <div class="heatmap-cell zone-med">
+                                    <div class="risk-marker" title="6 Riesgos aquí">X6</div>
+                                </div>
+                                <div class="heatmap-cell zone-high">
+                                    <div class="risk-marker" title="6 Riesgos aquí">X6</div>
+                                </div>
+                                <div class="heatmap-cell zone-crit"></div>
 
+                                <!-- Row 2: Prob 2 -->
                                 <div class="heatmap-header">2</div>
-                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
-                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
-                                <div class="heatmap-cell" style="background:#fef08a;"></div>
-                                <div class="heatmap-cell" style="background:#fde047;"></div>
-                                <div class="heatmap-cell" style="background:#fdba74;"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-med">
+                                    <div class="risk-marker" title="2 Riesgos aquí">X2</div>
+                                </div>
+                                <div class="heatmap-cell zone-med">
+                                    <div class="risk-marker" title="3 Riesgos aquí">X3</div>
+                                </div>
+                                <div class="heatmap-cell zone-high">
+                                    <div class="risk-marker" title="3 Riesgos aquí">X3</div>
+                                </div>
 
+                                <!-- Row 1: Prob 1 -->
                                 <div class="heatmap-header">1</div>
-                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
-                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
-                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
-                                <div class="heatmap-cell" style="background:#fef08a;"></div>
-                                <div class="heatmap-cell" style="background:#fde047;"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-low"></div>
+                                <div class="heatmap-cell zone-med">
+                                    <div class="risk-marker" title="Contaminación">8</div>
+                                </div>
 
                                 <!-- X Axis Scale -->
                                 <div></div> <!-- Empty Corner -->
@@ -1126,32 +1148,284 @@
                     </div>
                 </div>
                 
-                <div class="card">
-                    <h3>Leyenda de Riesgos</h3>
+                <div class="card" style="max-height: 500px; overflow-y: auto;">
+                    <h3>Listado Completo (23 Riesgos)</h3>
                     <ul style="list-style: none; margin-top: 16px; font-size: 13px;">
-                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
-                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">1</span>
-                            <div>
-                                <strong>Fenómeno El Niño</strong>
-                                <div style="color: #64748B; font-size: 11px;">Impacto en captura y rutas.</div>
+                        <!-- ITEM 1 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">1</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Escasez de materia prima</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Reducción capacidad productiva. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Escasez MP', 'Contratos múltiples, proveedores internacionales, compras anticipadas.')">Ver Plan</button>
                             </div>
                         </li>
-                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
-                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">2</span>
-                            <div>
-                                <strong>Vedas Biológicas</strong>
-                                <div style="color: #64748B; font-size: 11px;">Paralización total de suministro.</div>
+                        <!-- ITEM 2 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">2</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Fenómenos Climáticos</strong>
+                                    <span style="color:#EF4444; font-weight:bold; font-size:10px;">MUY ALTO (16)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">El Niño/La Niña. P:4 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Clima', 'Inventarios estratégicos, diversificación geográfica, pronósticos IDEAM/FAO.')">Ver Plan</button>
                             </div>
                         </li>
-                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
-                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">3</span>
-                            <div>
-                                <strong>Precio Combustible</strong>
-                                <div style="color: #64748B; font-size: 11px;">Aumento costos de flete.</div>
+                        <!-- ITEM 3 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">3</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Precio Acero (Latas)</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Incremento costo empaque. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Acero', 'Acuerdos de precio, compras a largo plazo, materiales alternativos.')">Ver Plan</button>
                             </div>
                         </li>
-                        <li style="margin-top: 15px;">
-                            <button class="btn-download" style="width: 100%; justify-content: center;" onclick="openModal('Plan de Mitigación', 'Estrategias definidas en el documento: Diversificación de proveedores, coberturas financieras para combustible y almacenamiento estratégico de inventario.')">Ver Planes de Mitigación</button>
+                        <!-- ITEM 4 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">4</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Cambios Regulatorios</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (8)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">INVIMA/FDA. Ajustes BPM. P:2 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Regulación', 'Auditorías internas, actualización HACCP, capacitación continua.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 5 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">5</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Costo Combustible</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Aumento costo logístico. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Combustible', 'Optimización de rutas, transporte consolidado.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 6 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">6</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Interrupciones Logísticas</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Paros, bloqueos. Retraso distribución. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Logística', 'Rutas alternas, operadores múltiples, uso de puertos secundarios.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 7 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">7</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Cortes de Energía</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (10)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Paro producción. P:2 I:5</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Energía', 'Plantas eléctricas, mantenimiento preventivo, priorización líneas críticas.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 8 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">8</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Contaminación Microb.</strong>
+                                    <span style="color:#10B981; font-weight:bold; font-size:10px;">BAJO (5)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Riesgo recall. P:1 I:5</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Microbiología', 'HACCP, muestreo intensivo, trazabilidad completa.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 9 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">9</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Único Proveedor Envases</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (10)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Paro producción. P:2 I:5</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Proveedores', 'Homologación de proveedores, contratos duales.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 10 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">10</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Fluctuación Cambio</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Costo importados. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Divisas', 'Coberturas cambiarias, compras anticipadas.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 11 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">11</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Crisis Económicas</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (6)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Menor consumo premium. P:2 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Crisis', 'Portafolio económico, promociones.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 12 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">12</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Preferencias Consumidor</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (6)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Menor demanda tradicionales. P:2 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Mercado', 'Innovación, reformulación, campañas educativas.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 13 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">13</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Requisitos Ambientales</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (8)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Inv. sostenibilidad. P:2 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Ambiente', 'Envases reciclables, certificaciones ambientales.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 14 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">14</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Escasez Aceites</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Aumento costos. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Aceites', 'Diversificación proveedores, contratos futuros.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 15 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">15</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Riesgos Geopolíticos</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (8)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Guerras, sanciones. P:2 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Geopolítica', 'Mercados alternos, acuerdos plurianuales.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 16 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">16</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Control Calidad</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Defectos al mercado. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Calidad', 'Capacitación, doble verificación, sensores.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 17 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">17</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Proceso Térmico</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (10)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Riesgo microbiológico. P:2 I:5</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Autoclave', 'Automatización, validación térmica, alarmas HACCP.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 18 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">18</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Etiquetado</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Pérdida trazabilidad. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Etiquetado', 'Etiquetado digital, revisión cruzada, escáneres.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 19 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">19</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Inventarios (FIFO)</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Producto vencido. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: FIFO', 'ERP, auditorías, capacitación logística.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 20 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">20</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Recepción MP</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Ingreso fuera especificación. P:3 I:4</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Recepción', 'Protocolos inspección, hojas técnicas, rechazo.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 21 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">21</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Despacho</strong>
+                                    <span style="color:#F97316; font-weight:bold; font-size:10px;">ALTO (12)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Producto equivocado. P:4 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Despacho', 'Checklists, supervisión, escaneo RFID.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 22 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">22</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Mala Manipulación</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Latas abolladas. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Manipulación', 'Capacitación, rutas señalizadas.')">Ver Plan</button>
+                            </div>
+                        </li>
+                        <!-- ITEM 23 -->
+                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: start;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px; flex-shrink: 0;">23</span>
+                            <div style="width: 100%;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Error Administrativo</strong>
+                                    <span style="color:#F59E0B; font-weight:bold; font-size:10px;">MEDIO (9)</span>
+                                </div>
+                                <div style="color: #64748B; font-size: 11px; margin-bottom: 6px;">Orden mal digitada. P:3 I:3</div>
+                                <button class="btn-download" style="padding: 4px 8px; font-size: 10px; width: 100%; justify-content:center;" onclick="openModal('Plan: Admin', 'Doble verificación, formularios automatizados.')">Ver Plan</button>
+                            </div>
                         </li>
                     </ul>
                 </div>
