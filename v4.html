@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuna Logistics | Full Engineering Report</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        'tech-blue': '#2997ff',
+                        'tech-red': '#ff453a',
+                        'tech-green': '#32d74b',
+                        'tech-orange': '#ff9f0a',
+                        'panel-bg': 'rgba(20, 20, 22, 0.85)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { margin: 0; background-color: #050505; color: #f5f5f7; overflow-x: hidden; }
+        
+        #canvas-container {
+            position: fixed; inset: 0; z-index: 0;
+            pointer-events: all; /* Allows rotation */
+        }
+
+        /* Reading Panels */
+        .content-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 3px solid #333;
+            padding: 2.5rem;
+            border-radius: 0 1rem 1rem 0;
+            max-width: 600px;
+            margin-left: 5%; 
+            transition: all 0.5s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        
+        .content-panel:hover {
+            border-left-color: var(--accent-color, #2997ff);
+            background: rgba(25, 25, 28, 0.95);
+        }
+
+        /* Typography */
+        h2 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; line-height: 1.1; }
+        p { font-family: 'Inter', sans-serif; line-height: 1.7; color: #a1a1a6; font-size: 0.95rem; text-align: justify; }
+        strong { color: #fff; font-weight: 600; }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .kpi-item span:first-child { display: block; font-size: 0.7rem; text-transform: uppercase; color: #86868b; letter-spacing: 1px; }
+        .kpi-item span:last-child { display: block; font-size: 1.25rem; font-weight: 700; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+
+        /* Scrollytelling Layout */
+        .scroll-section {
+            min-height: 120vh; /* Longer scroll for reading time */
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+            pointer-events: none;
+        }
+        .scroll-section > * { pointer-events: auto; }
+
+        /* Animations */
+        .fade-in { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .active .fade-in { opacity: 1; transform: translateY(0); }
+
+        /* Utilities */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        
+        .highlight-text { color: #2997ff; }
+        
+        /* Loading */
+        #loader { transition: opacity 0.8s ease; }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div id="loader" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <div class="font-display font-bold text-3xl tracking-widest text-white mb-2">TUNA<span class="text-gray-600">LOGISTICS</span></div>
+        <div class="text-xs font-mono text-gray-500">CARGANDO RECURSOS DE INGENIERÍA...</div>
+    </div>
+
+    <!-- 3D Layer -->
+    <div id="canvas-container"></div>
+
+    <!-- Persistent HUD -->
+    <div class="fixed top-0 w-full p-6 z-40 flex justify-between items-start pointer-events-none mix-blend-screen">
+        <div>
+            <div class="text-xs font-mono text-gray-500 mb-1">DOCUMENTO TÉCNICO</div>
+            <div class="text-lg font-bold text-white tracking-tight">Logística Integral del Atún</div>
+        </div>
+        <div class="hidden md:block text-right">
+             <div class="text-xs font-mono text-gray-500 mb-1">ESTADO DEL SISTEMA</div>
+             <div class="flex items-center justify-end gap-2">
+                 <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                 <span class="text-xs font-bold text-white">ONLINE</span>
+             </div>
+        </div>
+    </div>
+
+    <!-- Interactive Controls (Right Bottom) -->
+    <div class="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4 pointer-events-auto">
+        <!-- Temperature Panel (Contextual) -->
+        <div id="temp-control" class="bg-gray-900/90 backdrop-blur-md p-4 rounded-xl border border-white/10 w-64 translate-x-full opacity-0 transition-all duration-500">
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-xs font-mono text-tech-blue">SENSOR TÉRMICO</span>
+                <span id="temp-display" class="text-xl font-bold font-display text-white">2.0°C</span>
+            </div>
+            <input type="range" min="-2" max="10" step="0.1" value="2" id="temp-slider" class="w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer">
+            <div id="histamine-warning" class="hidden mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded text-[10px] text-red-400 leading-tight">
+                <strong>ALERTA CRÍTICA:</strong> Formación de histamina irreversible. Lote comprometido.
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex flex-col gap-2 bg-black/40 p-2 rounded-full backdrop-blur">
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-100 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+             <div class="w-1.5 h-1.5 bg-white rounded-full opacity-30 nav-dot"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT SCROLL -->
+    <main>
+        
+        <!-- 0. INTRO -->
+        <section class="scroll-section active" id="sec-0">
+            <div class="w-full text-center px-4 fade-in">
+                <span class="text-tech-blue border border-tech-blue/30 px-3 py-1 rounded-full text-xs uppercase tracking-widest bg-tech-blue/10 mb-6 inline-block">Informe Ejecutivo</span>
+                <h1 class="text-6xl md:text-8xl font-display font-bold text-white mb-6 leading-none">
+                    Complejidad<br>Oceánica.
+                </h1>
+                <p class="max-w-2xl mx-auto text-lg text-gray-400">
+                    El atún enlatado no es solo un producto; es el resultado de una orquestación logística transoceánica que gestiona biología inestable, termodinámica estricta y geopolítica global.
+                </p>
+            </div>
+        </section>
+
+        <!-- 1. BIOLOGÍA (Expanded) -->
+        <section class="scroll-section" id="sec-1">
+            <div class="content-panel fade-in" style="--accent-color: #2997ff;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 01</span>
+                <h2 class="text-3xl font-bold text-white mb-4">Taxonomía y Logística</h2>
+                <p class="mb-4">
+                    La "materia prima" no es uniforme. La logística de aprovisionamiento debe adaptarse a las diferencias biológicas que determinan el valor comercial y las técnicas de preservación.
+                </p>
+                <p class="mb-4">
+                    El <strong>Skipjack (Katsuwonus pelamis)</strong> constituye el volumen principal ("light meat"). Su ciclo de vida rápido permite operaciones de cerco a gran escala donde la velocidad de congelación en masa es crítica.
+                </p>
+                <p>
+                    Por contraste, el <strong>Yellowfin (Thunnus albacares)</strong> se destina a productos de mayor valor. Requiere un manejo delicado en la estiba para evitar daños físicos que degraden la carne, exigiendo segregación de lotes en bodega.
+                </p>
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <span>Método Masivo</span>
+                        <span>Salmuera</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span>Método Premium</span>
+                        <span>ULT (-60°C)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. CADENA DE FRÍO (Deep Technical) -->
+        <section class="scroll-section" id="sec-2">
+            <div class="content-panel fade-in" style="--accent-color: #ff453a;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 02 • CRÍTICO</span>
+                <h2 class="text-3xl font-bold text-white mb-4">La Barrera de la Histamina</h2>
+                <p class="mb-4">
+                    El parámetro crítico de control es la formación de <strong>histamina</strong> (escombrotoxina). Esta se genera cuando el atún se expone a temperaturas superiores a los <span class="text-tech-red">4°C</span> por periodos prolongados.
+                </p>
+                <div class="bg-red-500/10 border-l-2 border-red-500 p-3 my-4">
+                    <p class="text-sm text-red-200 !text-left">
+                        <strong>Dato Vital:</strong> La histamina es <em>termoestable</em>. El proceso de esterilización en autoclave NO la elimina. Un fallo en la cadena de frío convierte el inventario en residuo peligroso irreversible.
+                    </p>
+                </div>
+                <p>
+                    Las regulaciones (FDA/EFSA) establecen límites de <strong>50 ppm</strong>. La industria opera internamente bajo 20 ppm para mitigar riesgos. La cadena de frío debe ser ininterrumpida desde la captura hasta el cocedor.
+                </p>
+                 <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <span>Límite Regulatorio</span>
+                        <span>50 PPM</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span>Temp. Límite</span>
+                        <span>&gt; 4°C</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PROCESAMIENTO (Exploded View Text) -->
+        <section class="scroll-section" id="sec-3">
+            <div class="content-panel fade-in" style="--accent-color: #bf5af2;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 03</span>
+                <h2 class="text-3xl font-bold text-white mb-4">La Lógica de los Lomos</h2>
+                <p class="mb-4">
+                    Históricamente, las conserveras procesaban pescado entero. Hoy, la industria utiliza la "Deslocalización de Lomos". Se procesa en origen (Ecuador, Tailandia) para realizar limpieza y cocción.
+                </p>
+                <p class="mb-4">
+                    <strong>¿Por qué?</strong> Se eliminan cabezas, espinas y vísceras en origen. Esto evita transportar un <strong>60% de desperdicio</strong> a través de los océanos, optimizando radicalmente los fletes y reduciendo la huella de carbono.
+                </p>
+                <p>
+                    Los lomos congelados actúan como un <em>Buffer Stock</em>, desacoplando la variabilidad de la pesca de la demanda del mercado final en Europa o EE.UU.
+                </p>
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <span>Reducción Peso</span>
+                        <span>~60%</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span>Capacidad Planta</span>
+                        <span>100k Latas/h</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LOGÍSTICA & TRANSPORTE -->
+        <section class="scroll-section" id="sec-4">
+            <div class="content-panel fade-in" style="--accent-color: #ff9f0a;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 04</span>
+                <h2 class="text-3xl font-bold text-white mb-4">Densidad y Estiba</h2>
+                <p class="mb-4">
+                    El atún enlatado es "carga pesada" (Dry Cargo de alta densidad). El factor limitante en transporte no es el volumen, sino el peso máximo permitido por eje.
+                </p>
+                <p class="mb-4">
+                    Se prefieren contenedores <strong>TEU de 20 pies</strong> sobre los de 40, ya que llenarlos completamente excedería el payload máximo. El Factor de Estiba oscila entre <strong>1.60 y 1.68 m³/ton</strong>.
+                </p>
+                <p>
+                    <strong>Riesgo: Lluvia de Contenedor.</strong> La condensación por cambios térmicos en tránsito causa oxidación. Se mitiga con desecantes y control de humedad en pallets (<18%).
+                </p>
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <span>Factor Estiba</span>
+                        <span>1.68 m³/ton</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span>Unidad Óptima</span>
+                        <span>20' Dry Van</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. FACTORES EXTERNOS (El Niño) -->
+        <section class="scroll-section" id="sec-5">
+            <div class="content-panel fade-in" style="--accent-color: #ff3b30;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 05 • DISRUPCIÓN</span>
+                <h2 class="text-3xl font-bold text-white mb-4">El Efecto ENOS (El Niño)</h2>
+                <p class="mb-4">
+                    El calentamiento del Pacífico desplaza la biomasa de atún buscando aguas frías. Esto alarga dramáticamente las rutas de pesca, aumentando costos de combustible y tiempos de ciclo.
+                </p>
+                <p class="mb-4">
+                    Durante la fase activa, las capturas pueden caer un <strong>14%</strong>. Paradójicamente, post-evento ocurre un "rejuvenecimiento" poblacional que dispara la oferta hasta un <strong>40%</strong>, saturando la capacidad frigorífica en tierra.
+                </p>
+                <p>
+                    A esto se suma la geopolítica: regulaciones como la tarjeta amarilla (IUU) exigen que el flujo de información documental viaje a la par del flujo físico.
+                </p>
+                 <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <span>Var. Captura</span>
+                        <span>-14% / +40%</span>
+                    </div>
+                    <div class="kpi-item">
+                        <span>Riesgo</span>
+                        <span>Saturación</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. FINANZAS & CIERRE -->
+        <section class="scroll-section" id="sec-6">
+            <div class="content-panel fade-in" style="--accent-color: #32d74b;">
+                <span class="text-xs font-mono text-gray-500 mb-2 block">CAPÍTULO 06</span>
+                <h2 class="text-3xl font-bold text-white mb-4">Competitividad Financiera</h2>
+                <p class="mb-4">
+                    En un mercado de márgenes estrechos, la logística es el diferenciador. Casos como <strong>Thai Union</strong> y sus "Blue Loans" demuestran que la trazabilidad sostenible reduce el costo de capital financiero.
+                </p>
+                <p class="mb-4">
+                    Empresas como <strong>Bumble Bee</strong> utilizan Blockchain para garantizar la legalidad desde la captura, transformando un costo de cumplimiento en un activo de marketing premium.
+                </p>
+                <div class="mt-8 pt-4 border-t border-white/10">
+                    <h3 class="text-sm font-bold text-white mb-2">KPIs Estratégicos:</h3>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li>• <strong>OTIF:</strong> On-Time In-Full (Clave para Retail)</li>
+                        <li>• <strong>Cost-to-Serve:</strong> Rentabilidad real por cliente</li>
+                        <li>• <strong>FEFO:</strong> First Expired, First Out (Rotación)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="h-[50vh] flex items-center justify-center">
+            <div class="text-center">
+                <h2 class="text-2xl font-display font-bold text-white mb-4">Fin del Informe</h2>
+                <button class="px-6 py-3 border border-white/20 rounded-full text-sm hover:bg-white/10 transition">Reiniciar Visualización</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 3D & Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        // --- 1. SETUP ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.03); // Deep fog
+
+        const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 10);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // --- 2. LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+
+        // Key Light
+        const spotLight = new THREE.SpotLight(0xffffff, 5);
+        spotLight.position.set(5, 5, 5);
+        spotLight.castShadow = true;
+        spotLight.shadow.bias = -0.0001;
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
+        scene.add(spotLight);
+
+        // Rim Light (Color changeable)
+        const rimLight = new THREE.SpotLight(0x2997ff, 8);
+        rimLight.position.set(-5, 2, -5);
+        rimLight.lookAt(0, 0, 0);
+        scene.add(rimLight);
+
+        // Fill Light
+        const fillLight = new THREE.PointLight(0x111111, 2);
+        fillLight.position.set(0, -5, 2);
+        scene.add(fillLight);
+
+        // --- 3. OBJECTS ---
+        const canGroup = new THREE.Group();
+
+        // Materials
+        const metalMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.2, metalness: 0.9 });
+        const labelMat = new THREE.MeshStandardMaterial({ color: 0x0a1018, roughness: 0.6, metalness: 0.2, side: THREE.DoubleSide });
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.8 });
+        const tunaMat = new THREE.MeshStandardMaterial({ color: 0xff8888, roughness: 0.8 }); // Meat color
+
+        // Geometry construction
+        // Body
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 1.0, 64), metalMat);
+        body.castShadow = true; body.receiveShadow = true;
+        canGroup.add(body);
+
+        // Label
+        const label = new THREE.Mesh(new THREE.CylinderGeometry(1.205, 1.205, 0.7, 64, 1, true), labelMat);
+        canGroup.add(label);
+
+        // Rims
+        const rimGeo = new THREE.TorusGeometry(1.2, 0.04, 32, 100);
+        const rimTop = new THREE.Mesh(rimGeo, metalMat); rimTop.position.y = 0.5; rimTop.rotation.x = Math.PI/2;
+        canGroup.add(rimTop);
+        const rimBot = rimTop.clone(); rimBot.position.y = -0.5;
+        canGroup.add(rimBot);
+
+        // Lid & Mechanism
+        const lidGroup = new THREE.Group();
+        lidGroup.position.y = 0.5;
+        const lidPlate = new THREE.Mesh(new THREE.CylinderGeometry(1.18, 1.18, 0.02, 64), goldMat);
+        lidPlate.castShadow = true;
+        lidGroup.add(lidPlate);
+        
+        // Tab
+        const tab = new THREE.Group();
+        tab.position.set(0.6, 0.02, 0); tab.rotation.y = Math.PI/2;
+        tab.add(new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.02, 16, 32), metalMat));
+        const rivet = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), metalMat);
+        rivet.position.x = -0.3; tab.add(rivet);
+        lidGroup.add(tab);
+        canGroup.add(lidGroup);
+
+        // Internal Content (Hidden)
+        const contents = new THREE.Group();
+        const meat = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, 0.85, 32), tunaMat);
+        contents.add(meat);
+        contents.scale.set(0,0,0);
+        canGroup.add(contents);
+
+        scene.add(canGroup);
+
+        // Particles
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(600); // 200 points * 3
+        for(let i=0; i<600; i++) pPos[i] = (Math.random()-0.5)*15;
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({size: 0.02, color: 0x444444, transparent: true, opacity: 0.5}));
+        scene.add(particles);
+
+        // --- 4. ANIMATION LOGIC ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Helper to color change
+        function setRimColor(colorHex) {
+            gsap.to(rimLight.color, { r: new THREE.Color(colorHex).r, g: new THREE.Color(colorHex).g, b: new THREE.Color(colorHex).b, duration: 1 });
+        }
+
+        // Timeline 0: Intro -> Bio
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-0", start: "top top", end: "bottom top", scrub: 1 }
+        })
+        .to(camera.position, { x: -3, y: 0, z: 7 })
+        .to(canGroup.position, { x: 2, y: 0, z: 0 }, "<")
+        .to(canGroup.rotation, { z: 0.2, y: -0.5 }, "<");
+
+        // Timeline 1: Bio -> Cold (Freeze Effect)
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-1", start: "top top", end: "bottom top", scrub: 1,
+            onEnter: () => {
+                document.getElementById('temp-control').classList.remove('translate-x-full', 'opacity-0');
+                setRimColor(0x2997ff);
+            },
+            onLeaveBack: () => document.getElementById('temp-control').classList.add('translate-x-full', 'opacity-0')
+            }
+        })
+        .to(camera.position, { x: 0, y: 2, z: 4 })
+        .to(canGroup.position, { x: 0 }, "<")
+        .to(canGroup.rotation, { x: 0, y: Math.PI, z: 0 }, "<");
+
+        // Timeline 2: Cold -> Processing (Explode)
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-2", start: "top top", end: "bottom top", scrub: 1,
+            onLeave: () => document.getElementById('temp-control').classList.add('translate-x-full', 'opacity-0')
+            }
+        })
+        .to(camera.position, { x: 3, y: 1, z: 5 })
+        .to(lidGroup.position, { y: 2, x: -1 }, "<")
+        .to(lidGroup.rotation, { z: -0.5 }, "<")
+        .to(body.position, { y: -0.5 }, "<")
+        .to(rimBot.position, { y: -1 }, "<")
+        .to(contents.scale, { x:0.95, y:0.95, z:0.95 }, "<")
+        .call(() => setRimColor(0xbf5af2), null, 0); // Purple for processing
+
+        // Timeline 3: Processing -> Logistics (Reassemble & Stack View)
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-3", start: "top top", end: "bottom top", scrub: 1 }
+        })
+        .to([lidGroup.position, body.position, rimBot.position], { x:0, y: (i,t) => t===body?0:(t===lidGroup?0.5:-0.5), duration: 0.5 })
+        .to(lidGroup.rotation, { z: 0 }, "<")
+        .to(contents.scale, { x:0, y:0, z:0 }, "<")
+        .to(canGroup.rotation, { x: 0, y: 0, z: Math.PI/2 }, ">0.2") // Rotate sideways
+        .to(camera.position, { x: 0, y: 0, z: 6 }, "<")
+        .call(() => setRimColor(0xff9f0a), null, "<"); // Orange for logistics
+
+        // Timeline 4: Logistics -> External (Red Alert)
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-4", start: "top top", end: "bottom top", scrub: 1 }
+        })
+        .to(canGroup.position, { z: -4, y: 2 }, "<") // Floating away
+        .to(canGroup.rotation, { z: Math.PI/2 + 0.5, y: 0.5 }, "<")
+        .call(() => setRimColor(0xff3b30), null, "<"); // Red for danger
+
+        // Timeline 5: External -> Finance (Stable Green)
+        gsap.timeline({
+            scrollTrigger: { trigger: "#sec-5", start: "top top", end: "bottom top", scrub: 1 }
+        })
+        .to(canGroup.position, { z: 0, y: 0, x: 0 })
+        .to(canGroup.rotation, { z: 0, y: 0, x: 0 }, "<")
+        .to(camera.position, { x: 2, y: 1, z: 5 }, "<")
+        .call(() => setRimColor(0x32d74b), null, "<"); // Green for money
+
+        // --- INTERACTIVITY ---
+        
+        // Loop
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+            
+            if(!gsap.isTweening(canGroup.position)) {
+                canGroup.position.y += Math.sin(t) * 0.001;
+            }
+            particles.rotation.y = t * 0.02;
+            
+            renderer.render(scene, camera);
+        }
+
+        // Temp Slider Logic
+        const slider = document.getElementById('temp-slider');
+        const display = document.getElementById('temp-display');
+        const warning = document.getElementById('histamine-warning');
+        
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            display.innerText = val.toFixed(1) + "°C";
+            if(val > 4) {
+                display.style.color = '#ff453a';
+                warning.classList.remove('hidden');
+                canGroup.position.x = (Math.random()-0.5)*0.1; // Shake
+            } else {
+                display.style.color = '#2997ff';
+                warning.classList.add('hidden');
+                canGroup.position.x = 0;
+            }
+        });
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Init
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    animate();
+                }, 800);
+            }, 1000);
+            
+            // Highlight nav dots on scroll
+            const sections = document.querySelectorAll('.scroll-section');
+            const dots = document.querySelectorAll('.nav-dot');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 300) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                dots.forEach((dot, idx) => {
+                    dot.style.opacity = (current === `sec-${idx}`) ? '1' : '0.3';
+                    dot.style.transform = (current === `sec-${idx}`) ? 'scale(1.5)' : 'scale(1)';
+                });
+            });
+        };
+
+    </script>
+</body>
+</html>
