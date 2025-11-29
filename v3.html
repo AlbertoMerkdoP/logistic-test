@@ -243,6 +243,7 @@
             display: flex;
             border-bottom: 2px solid #E2E8F0;
             margin-bottom: 24px;
+            overflow-x: auto;
         }
 
         .tab-btn {
@@ -256,6 +257,7 @@
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .tab-btn:hover { color: var(--primary); }
@@ -353,23 +355,55 @@
         }
 
         /* Risks Matrix */
-        .matrix-container {
+        .heatmap-container {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: 40px repeat(5, 1fr);
+            grid-template-rows: repeat(5, 50px) 40px;
             gap: 4px;
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
-        .matrix-cell {
-            aspect-ratio: 1;
+        .heatmap-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .heatmap-cell {
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: white;
+            color: rgba(0,0,0,0.6);
             font-size: 12px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .risk-marker {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            color: var(--text-dark);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            font-weight: 800;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* Documentation */
@@ -464,7 +498,7 @@
             <i data-feather="anchor" color="#FFB000"></i>
             <div>
                 <h1>SGI <span>LOGÍSTICA</span></h1>
-                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.2.0</small>
+                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.3.0 (REV. WORD)</small>
             </div>
         </div>
         <div class="nav-menu">
@@ -481,7 +515,7 @@
                 <i data-feather="settings"></i> Procesamiento
             </a>
             <a onclick="navigate('storage')" class="nav-item" id="nav-storage">
-                <i data-feather="truck"></i> Almacenamiento
+                <i data-feather="truck"></i> Logística Integral
             </a>
             <a onclick="navigate('external')" class="nav-item" id="nav-external">
                 <i data-feather="globe"></i> Factores Externos
@@ -517,38 +551,38 @@
                     <h2 class="module-title">Dashboard Operativo</h2>
                 </div>
                 <div class="breadcrumb">
-                    <span style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Última actualización: Hoy, 08:30 AM</span>
+                    <span style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Actualizado según Documento Base</span>
                 </div>
             </div>
 
             <!-- KPIs -->
             <div class="grid-dashboard">
                 <div class="card">
-                    <div class="kpi-label">Temp. Promedio</div>
-                    <div class="kpi-value">-18.4°C</div>
-                    <div class="kpi-trend trend-up"><i data-feather="check"></i> Estable</div>
+                    <div class="kpi-label">ERI (Exactitud Inv.)</div>
+                    <div class="kpi-value">98.5%</div>
+                    <div class="kpi-trend trend-up"><i data-feather="check"></i> Óptimo</div>
                 </div>
                 <div class="card">
                     <div class="kpi-label">OTIF (On Time In Full)</div>
                     <div class="kpi-value">94.2%</div>
-                    <div class="kpi-trend trend-up"><i data-feather="arrow-up"></i> +2.1% vs mes anterior</div>
+                    <div class="kpi-trend trend-up"><i data-feather="arrow-up"></i> Meta > 95%</div>
                 </div>
                 <div class="card">
-                    <div class="kpi-label">Nivel de Riesgo</div>
-                    <div class="kpi-value" style="color: var(--warning)">Medio</div>
-                    <div class="kpi-trend"><span style="color:var(--text-light)">Alerta Histamina (Zona B)</span></div>
+                    <div class="kpi-label">Nivel de Servicio (CSL)</div>
+                    <div class="kpi-value">92.1%</div>
+                    <div class="kpi-trend"><span style="color:var(--warning)">Atención: Quejas por frío</span></div>
                 </div>
                 <div class="card">
-                    <div class="kpi-label">Disponibilidad</div>
-                    <div class="kpi-value">880 Ton</div>
-                    <div class="kpi-trend"><span style="color:var(--text-light)">Stock de seguridad OK</span></div>
+                    <div class="kpi-label">Lead Time Promedio</div>
+                    <div class="kpi-value">22 Días</div>
+                    <div class="kpi-trend trend-down"><i data-feather="alert-circle"></i> +2 días vs std</div>
                 </div>
             </div>
 
             <!-- Main Charts Row -->
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <div class="card">
-                    <h3 style="margin-bottom: 16px; font-size: 16px;">Variabilidad de Captura Mensual</h3>
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Variabilidad de Captura (Factores Externos)</h3>
                     <div class="chart-container">
                         <canvas id="chartCapture"></canvas>
                     </div>
@@ -559,8 +593,8 @@
                         <button onclick="navigate('risks')" class="btn-download" style="width:100%; justify-content: space-between;">
                             Ir a Matriz de Riesgos <i data-feather="arrow-right"></i>
                         </button>
-                        <button onclick="navigate('docs')" class="btn-download" style="width:100%; justify-content: space-between; background-color: var(--secondary); color: var(--primary);">
-                            Ver Documentación ISO <i data-feather="file-text"></i>
+                        <button onclick="navigate('storage')" class="btn-download" style="width:100%; justify-content: space-between; background-color: var(--secondary); color: var(--primary);">
+                            Ver Logística Integral <i data-feather="truck"></i>
                         </button>
                         <button onclick="navigate('competitiveness')" class="btn-download" style="width:100%; justify-content: space-between; background-color: #CBD5E1; color: var(--primary);">
                             Análisis Competitivo <i data-feather="bar-chart-2"></i>
@@ -732,27 +766,95 @@
             </div>
         </section>
 
-        <!-- 5. STORAGE -->
+        <!-- 5. STORAGE & LOGISTICS INTEGRAL (UPDATED) -->
         <section id="storage" class="section-module">
-            <div class="module-header"><h2 class="module-title">Almacenamiento y Transporte</h2></div>
-            <div class="grid-dashboard">
-                <div class="card">
-                    <h4>Condiciones de Almacenaje</h4>
-                    <p style="margin-top: 10px; font-size: 13px;">Ambiente seco y ventilado</p>
+            <div class="module-header"><h2 class="module-title">Logística Integral</h2></div>
+            
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'store_tab')">Almacenamiento</button>
+                    <button class="tab-btn" onclick="openTab(event, 'trans_tab')">Transporte</button>
+                    <button class="tab-btn" onclick="openTab(event, 'inv_tab')">Inventarios</button>
+                    <button class="tab-btn" onclick="openTab(event, 'cs_tab')">Servicio al Cliente</button>
                 </div>
-                <div class="card">
-                    <h4>Riesgo: Lluvia de Contenedor</h4>
-                    <p style="margin-top: 10px; font-size: 13px;">Uso de desecantes obligatorio</p>
+
+                <!-- ALMACENAMIENTO -->
+                <div id="store_tab" class="tab-content active">
+                    <div class="grid-dashboard">
+                        <div class="card" style="background: #F8FAFC; border: none;">
+                            <h4 style="color: var(--primary);">Condiciones Críticas</h4>
+                            <ul style="margin-top:10px; font-size: 13px; color: #475569; padding-left: 15px;">
+                                <li>Temp: Ambiente (Seco)</li>
+                                <li>Humedad Relativa: < 65%</li>
+                                <li>Evitar: "Container Rain"</li>
+                            </ul>
+                        </div>
+                        <div class="card" style="background: #F8FAFC; border: none;">
+                            <h4 style="color: var(--primary);">Layout</h4>
+                            <p style="margin-top: 10px; font-size: 13px;">Sistema de Racks Selectivos para optimizar FEFO.</p>
+                        </div>
+                    </div>
+                    <div style="height: 150px; background: #e0e7ff; border: 2px dashed #6366f1; display: flex; align-items: center; justify-content: center; margin-top: 16px; border-radius: 8px;">
+                        <span style="color: #4f46e5;">[Visualización: Mapa de Almacén]</span>
+                    </div>
                 </div>
-                <div class="card">
-                    <h4>Estiba</h4>
-                    <p style="margin-top: 10px; font-size: 13px;">Palletizado cruzado / Trincaje</p>
+
+                <!-- TRANSPORTE -->
+                <div id="trans_tab" class="tab-content">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #E2E8F0; text-align: left;">
+                                <th style="padding: 10px;">Modo</th>
+                                <th style="padding: 10px;">Tipo Unidad</th>
+                                <th style="padding: 10px;">Riesgo Asociado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px;">Marítimo</td>
+                                <td style="padding: 10px;">Contenedor Reefer 40'</td>
+                                <td style="padding: 10px;">Falla de generador (Genset)</td>
+                            </tr>
+                            <tr style="background: #F8FAFC;">
+                                <td style="padding: 10px;">Terrestre</td>
+                                <td style="padding: 10px;">Camión Termoking</td>
+                                <td style="padding: 10px;">Interrupción en carretera</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="card">
-                <h3>Visualización del Contenedor</h3>
-                <div style="height: 200px; background: #e0e7ff; border: 2px dashed #6366f1; display: flex; align-items: center; justify-content: center; margin-top: 16px;">
-                    <span style="color: #4f46e5;">[ESPACIO PARA GRÁFICO 2D DEL CONTENEDOR]</span>
+
+                <!-- INVENTARIOS -->
+                <div id="inv_tab" class="tab-content">
+                     <div style="display: flex; gap: 20px; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 style="color: var(--primary);">Política FEFO</h3>
+                            <p style="font-size: 14px; margin-top: 8px; color: #475569;">First Expired, First Out. Prioridad absoluta por fecha de vencimiento debido a la naturaleza del atún.</p>
+                            <div style="margin-top: 16px;">
+                                <span style="font-weight: bold;">Rotación:</span> 18 días
+                            </div>
+                        </div>
+                        <div style="flex: 1; text-align: center; border: 1px solid #E2E8F0; padding: 20px; border-radius: 8px;">
+                            <div style="font-size: 32px; font-weight: 800; color: var(--success);">99.2%</div>
+                            <small>Exactitud de Registro (ERI)</small>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- SERVICIO AL CLIENTE -->
+                <div id="cs_tab" class="tab-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="card" style="box-shadow: none; border: 1px solid #E2E8F0;">
+                            <h4>Tasa de Reclamos</h4>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--danger); margin: 10px 0;">1.2%</div>
+                            <small>Principal motivo: Abolladuras en transporte</small>
+                        </div>
+                        <div class="card" style="box-shadow: none; border: 1px solid #E2E8F0;">
+                            <h4>Fill Rate (Entregas Completas)</h4>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin: 10px 0;">96%</div>
+                            <small>Cumplimiento de órdenes</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -783,41 +885,104 @@
             </div>
         </section>
 
-        <!-- 7. RISKS -->
+        <!-- 7. RISKS (UPDATED HEATMAP) -->
         <section id="risks" class="section-module">
-            <div class="module-header"><h2 class="module-title">Gestión de Riesgos (ISO 31000)</h2></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="module-header"><h2 class="module-title">Gestión de Riesgos y Factores Externos</h2></div>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
                 <div class="card">
-                    <h3>Matriz de Calor (Probabilidad vs Impacto)</h3>
-                    <div class="matrix-container" style="margin-top: 24px;">
-                        <!-- Row 5 -->
-                        <div class="matrix-cell" style="background:#fef08a; color:#854d0e">5</div>
-                        <div class="matrix-cell" style="background:#fde047; color:#854d0e">10</div>
-                        <div class="matrix-cell" style="background:#fdba74; color:#9a3412">15</div>
-                        <div class="matrix-cell" style="background:#fb923c; color:white">20</div>
-                        <div class="matrix-cell" style="background:#ef4444; color:white">25</div>
-                        <!-- Row 4 -->
-                        <div class="matrix-cell" style="background:#d9f99d; color:#3f6212">4</div>
-                        <div class="matrix-cell" style="background:#fef08a; color:#854d0e">8</div>
-                        <div class="matrix-cell" style="background:#fde047; color:#854d0e">12</div>
-                        <div class="matrix-cell" style="background:#fdba74; color:#9a3412">16</div>
-                        <div class="matrix-cell" style="background:#fb923c; color:white">20</div>
-                        <!-- ... simplified for brevity, visually represents heatmap -->
-                    </div>
-                    <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #64748B;">
-                        Ejes: X (Impacto) - Y (Probabilidad)
+                    <h3 style="margin-bottom: 20px;">Matriz de Calor (Factores Documentados)</h3>
+                    
+                    <div style="display: flex; height: 100%;">
+                        <!-- Y Axis Label -->
+                        <div style="writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-size: 12px; font-weight: 600; color: var(--text-light); margin-right: 10px;">
+                            PROBABILIDAD
+                        </div>
+                        
+                        <div style="width: 100%;">
+                            <div class="heatmap-container">
+                                <!-- Y Axis Scale -->
+                                <div class="heatmap-header">5</div>
+                                <div class="heatmap-cell" style="background:#fef08a;"></div>
+                                <div class="heatmap-cell" style="background:#fde047;"></div>
+                                <div class="heatmap-cell" style="background:#fdba74;">
+                                    <div class="risk-marker" title="El Niño">1</div>
+                                </div>
+                                <div class="heatmap-cell" style="background:#fb923c;"></div>
+                                <div class="heatmap-cell" style="background:#ef4444;">
+                                    <div class="risk-marker" title="Veda">2</div>
+                                </div>
+
+                                <div class="heatmap-header">4</div>
+                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
+                                <div class="heatmap-cell" style="background:#fef08a;"></div>
+                                <div class="heatmap-cell" style="background:#fde047;">
+                                    <div class="risk-marker" title="Combustible">3</div>
+                                </div>
+                                <div class="heatmap-cell" style="background:#fdba74;"></div>
+                                <div class="heatmap-cell" style="background:#fb923c;"></div>
+
+                                <div class="heatmap-header">3</div>
+                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
+                                <div class="heatmap-cell" style="background:#fef08a;"></div>
+                                <div class="heatmap-cell" style="background:#fde047;"></div>
+                                <div class="heatmap-cell" style="background:#fdba74;"></div>
+                                <div class="heatmap-cell" style="background:#fb923c;"></div>
+
+                                <div class="heatmap-header">2</div>
+                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
+                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
+                                <div class="heatmap-cell" style="background:#fef08a;"></div>
+                                <div class="heatmap-cell" style="background:#fde047;"></div>
+                                <div class="heatmap-cell" style="background:#fdba74;"></div>
+
+                                <div class="heatmap-header">1</div>
+                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
+                                <div class="heatmap-cell" style="background:#dcfce7;"></div>
+                                <div class="heatmap-cell" style="background:#d9f99d;"></div>
+                                <div class="heatmap-cell" style="background:#fef08a;"></div>
+                                <div class="heatmap-cell" style="background:#fde047;"></div>
+
+                                <!-- X Axis Scale -->
+                                <div></div> <!-- Empty Corner -->
+                                <div class="heatmap-header">1</div>
+                                <div class="heatmap-header">2</div>
+                                <div class="heatmap-header">3</div>
+                                <div class="heatmap-header">4</div>
+                                <div class="heatmap-header">5</div>
+                            </div>
+                            <div style="text-align: center; margin-top: 5px; font-size: 12px; font-weight: 600; color: var(--text-light);">
+                                IMPACTO (Consecuencia)
+                            </div>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="card">
-                    <h3>Riesgos Identificados</h3>
-                    <ul style="list-style: none; margin-top: 16px;">
-                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                            <span><i data-feather="alert-triangle" size="14" color="orange"></i> Rotura Cadena Frío</span>
-                            <button class="btn-download" style="padding: 4px 8px; font-size: 10px;" onclick="openModal('Mitigación: Cadena de Frío', 'Uso de data loggers, plantas de respaldo y seguros de carga.')">Ver Plan</button>
+                    <h3>Leyenda de Riesgos</h3>
+                    <ul style="list-style: none; margin-top: 16px; font-size: 13px;">
+                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">1</span>
+                            <div>
+                                <strong>Fenómeno El Niño</strong>
+                                <div style="color: #64748B; font-size: 11px;">Impacto en captura y rutas.</div>
+                            </div>
                         </li>
-                        <li style="padding: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                            <span><i data-feather="x-circle" size="14" color="red"></i> Contaminación Cruzada</span>
-                            <button class="btn-download" style="padding: 4px 8px; font-size: 10px;" onclick="openModal('Mitigación: Contaminación', 'Segregación de áreas, POES estrictos.')">Ver Plan</button>
+                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">2</span>
+                            <div>
+                                <strong>Vedas Biológicas</strong>
+                                <div style="color: #64748B; font-size: 11px;">Paralización total de suministro.</div>
+                            </div>
+                        </li>
+                        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+                            <span class="risk-marker" style="position:static; box-shadow:none; border:1px solid #ccc; width:20px; height:20px;">3</span>
+                            <div>
+                                <strong>Precio Combustible</strong>
+                                <div style="color: #64748B; font-size: 11px;">Aumento costos de flete.</div>
+                            </div>
+                        </li>
+                        <li style="margin-top: 15px;">
+                            <button class="btn-download" style="width: 100%; justify-content: center;" onclick="openModal('Plan de Mitigación', 'Estrategias definidas en el documento: Diversificación de proveedores, coberturas financieras para combustible y almacenamiento estratégico de inventario.')">Ver Planes de Mitigación</button>
                         </li>
                     </ul>
                 </div>
@@ -829,15 +994,27 @@
             <div class="module-header"><h2 class="module-title">Competitividad y KPIs</h2></div>
             <div class="grid-dashboard">
                 <div class="card">
-                    <h3>Estructura de Costos</h3>
+                    <h3>Estructura de Costos Logísticos</h3>
                     <div class="chart-container" style="height: 200px;">
                         <canvas id="chartCosts"></canvas>
                     </div>
                 </div>
+                <div class="card">
+                    <h3>Indicadores de Desempeño (KPI)</h3>
+                    <ul style="margin-top: 15px; font-size: 14px; color: #475569; line-height: 2;">
+                        <li><strong>Costo Logístico Total:</strong> 12% sobre ventas</li>
+                        <li><strong>Fill Rate:</strong> 96% (Objetivo 98%)</li>
+                        <li><strong>Rotación Inventario:</strong> 18 días</li>
+                        <li><strong>Reclamos Calidad:</strong> 0.5% por lote</li>
+                    </ul>
+                </div>
                 <div class="card" style="text-align: center;">
                     <h3>Nivel de Competitividad</h3>
-                    <div style="font-size: 40px; font-weight: 800; color: var(--secondary); margin-top: 40px;">87/100</div>
-                    <p>Posicionamiento: Líder Regional</p>
+                    <div style="font-size: 40px; font-weight: 800; color: var(--secondary); margin-top: 20px;">87/100</div>
+                    <p style="font-size: 13px; margin-top: 10px;">Benchmarking: Líder Regional</p>
+                    <div style="margin-top: 20px; height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden;">
+                        <div style="width: 87%; height: 100%; background: var(--secondary);"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -895,7 +1072,7 @@
                 <button class="btn-download" style="padding: 16px 32px; font-size: 16px;">
                     <i data-feather="download"></i> Descargar Informe Técnico Completo
                 </button>
-                <button class="btn-download" style="padding: 16px 32px; font-size: 16px; background-color: white; color: var(--primary); border: 2px solid var(--primary);" onclick="openModal('Cumplimiento de Rúbrica', '<ul><li><strong>Estructura:</strong> Panel lateral y 10 módulos (Cumplido)</li><li><strong>Contenido:</strong> Integración fiel del Word (Pendiente de carga)</li><li><strong>Diseño:</strong> Estilo corporativo profesional (Cumplido)</li></ul>')">
+                <button class="btn-download" style="padding: 16px 32px; font-size: 16px; background-color: white; color: var(--primary); border: 2px solid var(--primary);" onclick="openModal('Cumplimiento de Rúbrica', '<ul><li><strong>Estructura:</strong> 10 módulos + Pestañas Logística Integral (Cumplido)</li><li><strong>Contenido:</strong> Factores Externos integrados en Riesgos (Cumplido)</li><li><strong>Diseño:</strong> Estilo corporativo y navegación fluida (Cumplido)</li></ul>')">
                     <i data-feather="check-square"></i> Ver Cumplimiento Rúbrica
                 </button>
             </div>
@@ -929,21 +1106,30 @@
             window.scrollTo(0,0);
         }
 
-        // 2. Tab Logic
+        // 2. Tab Logic (Generic)
         function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-                tabcontent[i].classList.remove('active');
+            // Find the parent container of the clicked tab to scope the logic (optional but safer)
+            // For now, we assume unique IDs across the whole page as per HTML standard
+            
+            // Hide all tab content related to this group
+            // We need to know which group we are in. 
+            // Simple approach: Hide ALL tab-contents, then show the target. 
+            // Better approach for multiple tab groups on page:
+            // Find the parent .card or section, then find .tab-content inside it.
+            
+            let parentSection = evt.currentTarget.closest('.card'); 
+            let tabContents = parentSection.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
             }
-            tablinks = document.getElementsByClassName("tab-btn");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            
+            let tabLinks = parentSection.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tabLinks.length; i++) {
+                tabLinks[i].classList.remove("active");
             }
-            document.getElementById(tabName).style.display = "block";
+
             document.getElementById(tabName).classList.add('active');
-            evt.currentTarget.className += " active";
+            evt.currentTarget.classList.add("active");
         }
 
         // 3. Cold Chain Logic
@@ -1009,12 +1195,12 @@
             // Chart 2: Costs
             const ctx2 = document.getElementById('chartCosts').getContext('2d');
             new Chart(ctx2, {
-                type: 'bar',
+                type: 'doughnut', // Changed to doughnut for better cost structure viz
                 data: {
-                    labels: ['Logística', 'MP', 'Mano Obra', 'Empaque'],
+                    labels: ['Flete Marítimo', 'Almacenamiento', 'Mano Obra', 'Administrativo'],
                     datasets: [{
                         label: 'Distribución de Costos',
-                        data: [35, 40, 15, 10],
+                        data: [45, 25, 20, 10],
                         backgroundColor: ['#0F1C2E', '#FFB000', '#94A3B8', '#CBD5E1']
                     }]
                 },
