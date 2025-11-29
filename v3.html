@@ -8,7 +8,7 @@
     <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Iconos (Feather Icons) -->
     <script src="https://unpkg.com/feather-icons"></script>
@@ -331,27 +331,146 @@
             color: var(--white);
         }
 
-        /* Processing */
-        .process-flow {
+        /* --- NEW PROCESSING STYLES (IMPACTFUL) --- */
+        .process-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .process-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 24px;
             justify-content: center;
+            align-items: center;
         }
 
-        .process-card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid var(--secondary);
-            width: 200px;
+        .process-card-modern {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 24px;
+            width: 250px;
+            height: 280px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
             cursor: pointer;
-            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .process-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        /* Gold bar animation */
+        .process-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--secondary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: center;
+        }
+
+        .process-card-modern:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--secondary);
+        }
+
+        .process-card-modern:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Icon Styling */
+        .process-icon-box {
+            width: 70px;
+            height: 70px;
+            background: #F1F5F9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            margin-top: 10px;
+            color: var(--primary);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .process-card-modern:hover .process-icon-box {
+            background: var(--primary);
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        /* Big Number Watermark */
+        .process-number-bg {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            font-size: 80px;
+            font-weight: 900;
+            color: #F1F5F9;
+            z-index: 0;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .process-card-modern:hover .process-number-bg {
+            color: rgba(255, 176, 0, 0.1);
+            transform: translateX(-10px);
+        }
+
+        .process-title {
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 12px;
+            z-index: 2;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .process-desc {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+            z-index: 2;
+        }
+
+        .process-arrow-divider {
+            color: #CBD5E1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn-process-detail {
+            margin-top: auto; /* Push to bottom */
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 2;
+            transition: all 0.3s;
+        }
+        
+        .process-card-modern:hover .btn-process-detail {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            .process-arrow-divider { display: none; }
         }
 
         /* Risks Matrix */
@@ -498,7 +617,7 @@
             <i data-feather="anchor" color="#FFB000"></i>
             <div>
                 <h1>SGI <span>LOGÍSTICA</span></h1>
-                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.3.0 (REV. WORD)</small>
+                <small style="color: #64748B; font-size: 10px;">VERSIÓN 1.4.0 (UI PRO)</small>
             </div>
         </div>
         <div class="nav-menu">
@@ -737,30 +856,80 @@
             </div>
         </section>
 
-        <!-- 4. PROCESSING -->
+        <!-- 4. PROCESSING (REDESIGNED) -->
         <section id="processing" class="section-module">
             <div class="module-header">
                 <h2 class="module-title">Procesamiento Industrial</h2>
             </div>
+            
+            <p style="margin-bottom: 30px; color: #64748B;">Flujo de transformación desde materia prima hasta producto terminado. Pase el cursor para interactuar.</p>
 
-            <div class="card" style="margin-bottom: 24px;">
-                <h3 style="margin-bottom: 20px;">Diagrama de Flujo (Interactivo)</h3>
-                <div class="process-flow">
-                    <!-- Haz clic para ver detalles -->
-                    <div class="process-card" onclick="openModal('Recepción MP', 'Control de temperatura, análisis de histamina y clasificación por tallas.')">
-                        <strong>1. Recepción</strong>
+            <div class="process-container">
+                <!-- Row 1 -->
+                <div class="process-row">
+                    <!-- Step 1 -->
+                    <div class="process-card-modern" onclick="openModal('1. Recepción de MP', 'Clasificación por tallas, análisis sensorial y físico-químico (Histamina). Control de temperatura vital.')">
+                        <div class="process-number-bg">01</div>
+                        <div class="process-icon-box"><i data-feather="anchor" size="32"></i></div>
+                        <div class="process-title">Recepción</div>
+                        <p class="process-desc">Control de calidad y clasificación de tallas en muelle.</p>
+                        <button class="btn-process-detail">Ver Ficha Técnica</button>
                     </div>
-                    <div class="process-card" onclick="openModal('Cocción', 'Cocción al vapor para facilitar limpieza. Punto crítico de control.')">
-                        <strong>2. Cocción</strong>
+                    
+                    <div class="process-arrow-divider"><i data-feather="chevrons-right" size="32"></i></div>
+
+                    <!-- Step 2 -->
+                    <div class="process-card-modern" onclick="openModal('2. Cocción', 'Cocción al vapor a 102°C. El tiempo depende del tamaño del pescado. Punto Crítico de Control (PCC).')">
+                        <div class="process-number-bg">02</div>
+                        <div class="process-icon-box"><i data-feather="cloud-drizzle" size="32"></i></div>
+                        <div class="process-title">Cocción</div>
+                        <p class="process-desc">Tratamiento térmico para facilitar limpieza.</p>
+                        <button class="btn-process-detail">Ver Parámetros</button>
                     </div>
-                    <div class="process-card" onclick="openModal('Limpieza', 'Separación manual de piel, espinas y carne oscura.')">
-                        <strong>3. Limpieza</strong>
+
+                    <div class="process-arrow-divider"><i data-feather="chevrons-right" size="32"></i></div>
+
+                    <!-- Step 3 -->
+                    <div class="process-card-modern" onclick="openModal('3. Limpieza de Lomos', 'Proceso manual intensivo. Separación de piel, sangre, espinas y carne negra.')">
+                        <div class="process-number-bg">03</div>
+                        <div class="process-icon-box"><i data-feather="scissors" size="32"></i></div>
+                        <div class="process-title">Limpieza</div>
+                        <p class="process-desc">Separación manual de piel, espinas y carne oscura.</p>
+                        <button class="btn-process-detail">Ver Rendimientos</button>
                     </div>
-                    <div class="process-card" onclick="openModal('Envasado', 'Dosificación de lomos y líquido de cobertura (agua/aceite).')">
-                        <strong>4. Envasado</strong>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="process-row">
+                    <!-- Step 4 -->
+                    <div class="process-card-modern" onclick="openModal('4. Envasado', 'Adición de líquido de gobierno (aceite/agua) y sellado hermético de la lata.')">
+                        <div class="process-number-bg">04</div>
+                        <div class="process-icon-box"><i data-feather="box" size="32"></i></div>
+                        <div class="process-title">Envasado</div>
+                        <p class="process-desc">Dosificación precisa de lomos y líquido de cobertura.</p>
+                        <button class="btn-process-detail">Ver Maquinaria</button>
                     </div>
-                    <div class="process-card" style="border-left-color: var(--danger);" onclick="openModal('Esterilización', 'Tratamiento térmico en autoclave. Elimina Clostridium botulinum.')">
-                        <strong>5. Esterilización</strong>
+
+                    <div class="process-arrow-divider"><i data-feather="chevrons-right" size="32"></i></div>
+
+                    <!-- Step 5 -->
+                    <div class="process-card-modern" style="border-bottom: 4px solid var(--danger);" onclick="openModal('5. Esterilización (PCC)', 'Etapa más crítica. Autoclave a 116°C-121°C para eliminar Clostridium botulinum. Valor F0.')">
+                        <div class="process-number-bg">05</div>
+                        <div class="process-icon-box" style="color: var(--danger);"><i data-feather="alert-triangle" size="32"></i></div>
+                        <div class="process-title" style="color: var(--danger);">Esterilización</div>
+                        <p class="process-desc">Autoclave para inocuidad comercial (PCC).</p>
+                        <button class="btn-process-detail" style="border-color: var(--danger); color: var(--danger);">Ver Curva F0</button>
+                    </div>
+
+                    <div class="process-arrow-divider"><i data-feather="chevrons-right" size="32"></i></div>
+
+                    <!-- Step 6 -->
+                    <div class="process-card-modern" onclick="openModal('6. Empacado Final', 'Etiquetado, encartonado y paletizado. Cuarentena de 14 días para incubación.')">
+                        <div class="process-number-bg">06</div>
+                        <div class="process-icon-box"><i data-feather="check-circle" size="32"></i></div>
+                        <div class="process-title">Empacado</div>
+                        <p class="process-desc">Etiquetado, encajonado y cuarentena.</p>
+                        <button class="btn-process-detail">Ver Logística</button>
                     </div>
                 </div>
             </div>
